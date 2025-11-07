@@ -1,7 +1,10 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 plugins {
     java
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
+    id("jacoco") // Plugin de Jacoco para test de cobertura
 }
 
 group = "srangeldev"
@@ -9,6 +12,10 @@ version = "0.0.1-SNAPSHOT"
 description = "CamisApi"
 
 java {
+    // versión de Java
+    sourceCompatibility = JavaVersion.VERSION_25 // Sintaxis de Java 25
+    targetCompatibility = JavaVersion.VERSION_25 // Versión de Java 25 para ser compilado y ejecutado
+
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
@@ -18,12 +25,179 @@ repositories {
     mavenCentral()
 }
 
+// Extra properties for dependency versions
+val testcontainersVersion = "1.19.3"
+
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // Spring Boot Starters
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.springframework.boot:spring-boot-starter-graphql")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
+    // Thymeleaf extras
+    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+
+    // Database Drivers
+    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.h2database:h2")
+
+    // JWT - using Auth0 JWT
+    implementation("com.auth0:java-jwt:4.4.0")
+
+    // Swagger/OpenAPI
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+
+    // Jackson for JSON processing
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    // Jackson XML support
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+
+    // WebSocket
+    implementation("org.springframework:spring-websocket")
+    implementation("org.springframework:spring-messaging")
+
+    // Test Dependencies
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(
+            group = "org.junit.vintage",
+            module = "junit-vintage-engine"
+        ) // Por si usamos JUnit 4 en algún proyecto viejo
+    }
+    testImplementation("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.graphql:spring-graphql-test")
+
+    // TestContainers
+    testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
+    testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+    testImplementation("org.testcontainers:mongodb:$testcontainersVersion")
+
+    // MongoDB Test
+    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.11.0")
+
+    // Mockito
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+
+    testLogging {
+        events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showStandardStreams = false
+    }
+
+    // Separate integration tests
+    if (project.hasProperty("integrationTest")) {
+        filter {
+            includeTestsMatching("*IntegrationTest")
+            includeTestsMatching("*IT")
+        }
+    } else {
+        filter {
+            excludeTestsMatching("*IntegrationTest")
+            excludeTestsMatching("*IT")
+        }
+    }
+}
+
+// Create separate task for integration tests
+val integrationTest = tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests with TestContainers"
+    group = "verification"
+
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+
+    useJUnitPlatform {
+        includeTags("integration")
+    }
+
+    testLogging {
+        events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showStandardStreams = true
+    }
+
+    shouldRunAfter(tasks.test)
+}
+
+// Jacoco configuration
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco"))
+    }
+
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/config/**",
+                    "**/dto/**",
+                    "**/exceptions/**",
+                    "**/TiendaApiSpringBootApplication**"
+                )
+            }
+        })
+    )
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.75".toBigDecimal()
+                counter = "LINE"
+            }
+        }
+        rule {
+            limit {
+                minimum = "0.70".toBigDecimal()
+                counter = "BRANCH"
+            }
+        }
+    }
+
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/config/**",
+                    "**/dto/**",
+                    "**/exceptions/**",
+                    "**/TiendaApiSpringBootApplication**"
+                )
+            }
+        })
+    )
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
