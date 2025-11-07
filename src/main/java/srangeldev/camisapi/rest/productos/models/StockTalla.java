@@ -1,4 +1,4 @@
-package srangeldev.camisapi.rest.stockTalla;
+package srangeldev.camisapi.rest.productos.models;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -6,7 +6,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import srangeldev.camisapi.rest.productos.models.Camisetas;
 
 public class StockTalla {
     @Id
