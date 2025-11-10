@@ -226,15 +226,9 @@ src/main/java/srangeldev/camisapi/rest/
 
 ---
 
-## 📌 Próximos Pasos
+## 📌 Enlace a Driagrama E/R
 
-- [ ] Crear Repositories (MongoRepository y JpaRepository)
-- [ ] Implementar Services con lógica de negocio
-- [ ] Crear DTOs para requests/responses
-- [ ] Implementar Controllers REST
-- [ ] Configurar seguridad con JWT
-- [ ] Implementar job de expiración de carritos
-- [ ] Crear tests unitarios e integración
+[Diagrama E/R de CamisAPI](images/Diagrama ER.png)
 
 ---
 
