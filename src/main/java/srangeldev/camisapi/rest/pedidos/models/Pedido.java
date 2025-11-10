@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 📦 Modelo Pedido - PostgreSQL (JPA)
+ * Modelo Pedido - PostgreSQL (JPA)
  * 
  * Representa una compra confirmada y registrada en el sistema.
  * Incluye un snapshot completo de los productos en el momento de la venta.
@@ -65,7 +65,7 @@ public class Pedido {
     @CreationTimestamp
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     @Builder.Default
-    private LocalDateTime fechaCreacion = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
     
     /**
      * Total del pedido en euros
@@ -91,12 +91,6 @@ public class Pedido {
     private List<DetallePedido> detalles = new ArrayList<>();
     
     /**
-     * Dirección de envío (opcional)
-     */
-    @Column(name = "direccion_envio", length = 500)
-    private String direccionEnvio;
-    
-    /**
      * Fecha de pago (se establece cuando el estado cambia a PAGADO)
      */
     @Column(name = "fecha_pago")
@@ -107,10 +101,4 @@ public class Pedido {
      */
     @Column(name = "fecha_envio")
     private LocalDateTime fechaEnvio;
-    
-    /**
-     * Número de seguimiento del envío (opcional)
-     */
-    @Column(name = "numero_seguimiento", length = 100)
-    private String numeroSeguimiento;
 }

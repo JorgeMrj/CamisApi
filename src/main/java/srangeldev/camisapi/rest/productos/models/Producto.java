@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 /**
- * 👕 Modelo Producto - MongoDB
+ * Modelo Producto - MongoDB
  * 
  * Cada camiseta es ÚNICA, no hay control de stock ni unidades múltiples.
  * El campo `estado` es el núcleo del flujo de venta.
