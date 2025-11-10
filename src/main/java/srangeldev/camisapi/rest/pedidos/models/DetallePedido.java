@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 🧩 Modelo DetallePedido - PostgreSQL (JPA)
+ * Modelo DetallePedido - PostgreSQL (JPA)
  * 
  * Subentidad que guarda los datos INMUTABLES del producto al momento de la venta.
  * Actúa como una "foto" o snapshot del producto en el momento exacto de la compra.

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 🛒 Modelo Carrito - PostgreSQL (JPA)
+ * Modelo Carrito - PostgreSQL (JPA)
  * 
  * Guarda los productos que el usuario tiene temporalmente en su carrito.
  * Es una entidad transaccional que garantiza la integridad de las reservas.
