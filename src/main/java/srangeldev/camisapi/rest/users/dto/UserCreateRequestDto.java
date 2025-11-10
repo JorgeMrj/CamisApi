@@ -1,25 +1,21 @@
-package srangeldev.camisapi.rest.usuarios.models;
+package srangeldev.camisapi.rest.users.dto;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import srangeldev.camisapi.rest.users.models.Rol;
+
+import java.util.Set;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class Usuario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserCreateRequestDto {
 
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 50, message = "El nombre no puede tener más de 50 caracteres")
@@ -33,6 +29,6 @@ public class Usuario {
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     private String password;
 
-    @NotNull(message = "El rol es obligatorio")
-    private Rol role;
+    @NotNull(message = "Los roles no pueden ser nulos")
+    private Set<Rol> roles;
 }

@@ -7,14 +7,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public class StockTalla {
+public class StockCamiseta {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @NotNull(message = "La camiseta asociada no puede ser nula")
-    private Camisetas camiseta;
+    private Camiseta camiseta;
 
     @NotNull(message = "La talla es obligatoria")
     private Tallas tallas;
