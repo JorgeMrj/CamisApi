@@ -226,9 +226,9 @@ src/main/java/srangeldev/camisapi/rest/
 
 ---
 
-## 📌 Enlace a Driagrama E/R
+## 📌 Diagrama E/R
 
-[Diagrama E/R de CamisAPI](images/Diagrama ER.png)
+![Diagrama E/R de CamisAPI](images/Diagrama%20ER.png)
 
 ---
 
