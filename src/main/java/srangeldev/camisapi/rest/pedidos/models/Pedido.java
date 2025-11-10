@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import srangeldev.camisapi.rest.users.models.User;
 import srangeldev.camisapi.rest.usuarios.models.Usuario;
 
 import java.util.Date;
@@ -26,7 +27,7 @@ public class Pedido {
 
     @NotNull(message = "El usuario no puede ser nulo")
     @ManyToOne
-    private Usuario usuario;
+    private User usuario;
 
     @NotNull(message = "La fecha no puede ser nula")
     @PastOrPresent(message = "La fecha no puede ser futura")

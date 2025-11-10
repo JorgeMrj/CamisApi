@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import srangeldev.camisapi.rest.productos.models.StockTalla;
+import srangeldev.camisapi.rest.productos.models.StockCamiseta;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +28,7 @@ public class DetallePedido {
 
     @NotNull(message = "El stock de talla no puede ser nulo")
     @ManyToOne
-    private StockTalla stockTalla;
+    private StockCamiseta stockCamiseta;
 
     @Min(value = 1, message = "La cantidad debe ser al menos 1")
     private int cantidad;
