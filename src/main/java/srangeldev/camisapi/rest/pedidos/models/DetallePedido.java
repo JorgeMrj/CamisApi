@@ -1,39 +1,75 @@
 package srangeldev.camisapi.rest.pedidos.models;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.Min;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import srangeldev.camisapi.rest.productos.models.StockCamiseta;
 
+/**
+ * 🧩 Modelo DetallePedido - PostgreSQL (JPA)
+ * 
+ * Subentidad que guarda los datos INMUTABLES del producto al momento de la venta.
+ * Actúa como una "foto" o snapshot del producto en el momento exacto de la compra.
+ * 
+ * ¿Por qué es necesario?
+ * - Si el producto se modifica o elimina en MongoDB, el pedido seguirá siendo coherente
+ * - Permite mantener un histórico exacto de lo que se vendió y a qué precio
+ * - Garantiza que los datos del pedido no cambien aunque cambie el catálogo
+ */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Embeddable
 public class DetallePedido {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private Long id;
-
-    @NotNull(message = "El pedido no puede ser nulo")
-    @ManyToOne
-    private Pedido pedido;
-
-    @NotNull(message = "El stock de talla no puede ser nulo")
-    @ManyToOne
-    private StockCamiseta stockCamiseta;
-
-    @Min(value = 1, message = "La cantidad debe ser al menos 1")
-    private int cantidad;
-
-    @NotNull(message = "El precio no puede ser nulo")
-    @Positive(message = "El precio debe ser positivo")
-    private Double precio;
+    
+    /**
+     * Referencia al ID del producto en MongoDB
+     * Se mantiene para trazabilidad, aunque el producto puede ya no existir
+     */
+    @NotNull(message = "El ID del producto no puede ser nulo")
+    @Column(name = "producto_id", nullable = false, length = 24)
+    private String productoId;
+    
+    /**
+     * Nombre del producto en el momento de la venta
+     * Snapshot inmutable
+     */
+    @NotBlank(message = "El nombre no puede estar vacío")
+    @Column(name = "nombre", nullable = false, length = 200)
+    private String nombre;
+    
+    /**
+     * Talla del producto vendido
+     */
+    @NotBlank(message = "La talla no puede estar vacía")
+    @Column(name = "talla", nullable = false, length = 10)
+    private String talla;
+    
+    /**
+     * Equipo del producto vendido
+     */
+    @NotBlank(message = "El equipo no puede estar vacío")
+    @Column(name = "equipo", nullable = false, length = 100)
+    private String equipo;
+    
+    /**
+     * Precio pagado por el producto en el momento de la venta
+     * Este es el precio final, puede incluir descuentos
+     */
+    @NotNull(message = "El precio pagado no puede ser nulo")
+    @Positive(message = "El precio pagado debe ser positivo")
+    @Column(name = "precio_pagado", nullable = false)
+    private Double precioPagado;
+    
+    /**
+     * URL de la imagen del producto (opcional)
+     * Snapshot de la imagen en el momento de la venta
+     */
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
 }
