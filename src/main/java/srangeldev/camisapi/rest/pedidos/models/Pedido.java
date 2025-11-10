@@ -4,36 +4,37 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import srangeldev.camisapi.rest.productos.models.StockCamiseta;
+import srangeldev.camisapi.rest.users.models.User;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DetallePedido {
+public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private Long id;
 
-    @NotNull(message = "El pedido no puede ser nulo")
+    @NotNull(message = "El usuario no puede ser nulo")
     @ManyToOne
-    private Pedido pedido;
+    private User usuario;
 
-    @NotNull(message = "El stock de talla no puede ser nulo")
-    @ManyToOne
-    private StockCamiseta stockCamiseta;
+    @NotNull(message = "La fecha no puede ser nula")
+    @PastOrPresent(message = "La fecha no puede ser futura")
+    private Date fecha;
 
-    @Min(value = 1, message = "La cantidad debe ser al menos 1")
-    private int cantidad;
+    @NotNull(message = "El estado no puede ser nulo")
+    private Estado estado;
 
-    @NotNull(message = "El precio no puede ser nulo")
-    @Positive(message = "El precio debe ser positivo")
-    private Double precio;
+    @Positive(message = "El precio total debe ser positivo")
+    private double precioTotal;
 }
