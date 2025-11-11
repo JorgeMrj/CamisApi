@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Es insensible a mayúsculas/minúsculas.
      *
      * @param username Nombre de usuario
-     * @return Optional<User> con el usuario si se encuentra
+     * @return Optional con el usuario si se encuentra
      */
     Optional<User> findByUsernameIgnoreCase(String username);
 
@@ -26,19 +26,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Es insensible a mayúsculas/minúsculas.
      *
      * @param email Email del usuario
-     * @return Optional<User> con el usuario si se encuentra
+     * @return Optional con el usuario si se encuentra
      */
-    Optional<User> findByEmailIgnoreCase(String email);
+    // Nota: en esta versión la entidad `User` no contiene un campo 'email'.
+    // Si en el futuro se añade un campo 'email' a la entidad, se pueden
+    // descomentar los métodos siguientes o añadir otros más apropiados.
 
-    /**
-     * Busca un usuario por su nombre de usuario o email.
-     * Es insensible a mayúsculas/minúsculas.
-     *
-     * @param username Nombre de usuario
-     * @param email    Email
-     * @return Optional<User> con el usuario si se encuentra
-     */
-    Optional<User> findByUsernameIgnoreCaseOrEmailIgnoreCase(String username, String email);
+    // Optional<User> findByEmailIgnoreCase(String email);
+    // Optional<User> findByUsernameIgnoreCaseOrEmailIgnoreCase(String username, String email);
 
     /**
      * Busca usuarios por estado de borrado.

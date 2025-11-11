@@ -43,7 +43,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
     // Thymeleaf extras
-    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+    //implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 
     // Database Drivers
     runtimeOnly("org.postgresql:postgresql")
@@ -93,6 +93,18 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter")
 }
 
+// Javadoc configuration - ignore errors for Java 25
+tasks.withType<Javadoc> {
+    options {
+        (this as StandardJavadocDocletOptions).apply {
+            addStringOption("Xdoclint:none", "-quiet")
+            addStringOption("encoding", "UTF-8")
+            addStringOption("charSet", "UTF-8")
+        }
+    }
+    isFailOnError = false
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 
@@ -139,7 +151,7 @@ val integrationTest = tasks.register<Test>("integrationTest") {
 
 // Jacoco configuration
 jacoco {
-    toolVersion = "0.8.11"
+    toolVersion = "0.8.14"
 }
 
 tasks.jacocoTestReport {
