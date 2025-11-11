@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ProductoResponseDTO {
 
-    private String id;
+    private Long id;
     private String nombre;
     private String equipo;
     private String talla;

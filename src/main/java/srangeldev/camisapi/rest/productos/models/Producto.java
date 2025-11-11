@@ -100,7 +100,6 @@ public class Producto {
     private LocalDateTime fechaCreacion;
 
     /**
-     * Validación adicional de negocio:
      * - Si el estado es VENDIDO, precio y fechaCreacion no deben ser nulos
      */
     public void validarNegocio() {
