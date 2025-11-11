@@ -1,21 +1,12 @@
 package srangeldev.camisapi.rest.pedidos.repository;
 
-import srangeldev.camisapi.rest.pedidos.models.Pedido;
+import org.springframework.stereotype.Repository;
+
 
 import java.util.List;
 
 @Repository
-public class PedidoRepositoryImpl {
+public abstract class PedidoRepositoryImpl implements PedidoRepository {
 
-    @PersistenceContext
-    private EntityManager em;
-
-    //Consulta pa obtener pedidos por estado
-    public List<Pedido> buscarPedidosPorEstado(String estado) {
-        String jpql = "SELECT p FROM Pedido p WHERE p.estado = :estado";
-        TypedQuery<Pedido> query = em.createQuery(jpql, Pedido.class);
-        query.setParameter("estado", estado);
-        return query.getResultList();
-    }
 
 }
