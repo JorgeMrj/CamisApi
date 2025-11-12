@@ -1,63 +1,73 @@
 package srangeldev.camisapi.rest.pedidos.services;
 
 import org.springframework.stereotype.Service;
+import srangeldev.camisapi.rest.pedidos.dto.PedidoRequestDto;
+import srangeldev.camisapi.rest.pedidos.dto.PedidoResponseDto;
+import srangeldev.camisapi.rest.pedidos.mappers.PedidoMappers;
 import srangeldev.camisapi.rest.pedidos.models.EstadoPedido;
 import srangeldev.camisapi.rest.pedidos.models.Pedido;
 import srangeldev.camisapi.rest.pedidos.repository.PedidoRepository;
-import srangeldev.camisapi.rest.pedidos.repository.PedidoRepositoryImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
 
     private final PedidoRepository pedidoRepository;
-    private final PedidoRepositoryImpl pedidoRepositoryImpl;
+    private final PedidoMappers pedidoMapper;
 
-    public PedidoServiceImpl(PedidoRepository pedidoRepository, PedidoRepositoryImpl pedidoRepositoryImpl) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository, PedidoMappers pedidoMapper) {
         this.pedidoRepository = pedidoRepository;
-        this.pedidoRepositoryImpl = pedidoRepositoryImpl;
+        this.pedidoMapper = pedidoMapper;
     }
 
     @Override
-    public Pedido crearPedido(Pedido pedido) {
+    public PedidoResponseDto crearPedido(PedidoRequestDto pedidoRequest) {
+        Pedido pedido = pedidoMapper.toPedido(pedidoRequest);
         pedido.setEstado(EstadoPedido.PENDIENTE_PAGO);
-        pedido.setFechaCreacion(LocalDateTime.now());
-        return pedidoRepository.save(pedido);
+        pedido.setCreatedAt(LocalDateTime.now());
+        Pedido saved = pedidoRepository.save(pedido);
+        return pedidoMapper.toResponseDto(saved);
     }
 
     @Override
-    public List<Pedido> listarPedidos() {
-        return pedidoRepository.findAll();
+    public List<PedidoResponseDto> listarPedidos() {
+        return pedidoMapper.toResponseList(pedidoRepository.findAll());
     }
 
     @Override
-    public Pedido obtenerPorId(Long id) {
+    public List<PedidoResponseDto> obtenerPorUsuario(Long userId) {
+        List<Pedido> pedidos = pedidoRepository.findByUserId(userId);
+        return pedidoMapper.toResponseList(pedidos);
+    }
+
+    @Override
+    public Optional<PedidoResponseDto> obtenerPorId(Long id) {
         return pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("PEDIDO NO ENCONTRADO"));
+                .map(pedidoMapper::toResponseDto);
     }
 
     @Override
-    public List<Pedido> obtenerPorUsuario(Long userId) {
-        return pedidoRepository.findByUserId(userId);
-    }
-
-    @Override
-    public List<Pedido> obtenerPorEstado(EstadoPedido estado) {
-        return pedidoRepositoryImpl.pedidosPorEstado(estado);
-    }
-
-    @Override
-    public Pedido actualizarEstado(Long id, EstadoPedido estado) {
-        Pedido pedido = obtenerPorId(id);
+    public Optional<PedidoResponseDto> actualizarEstado(Long pedidoId, EstadoPedido estado) {
+        Optional<Pedido> pedidoOpt = pedidoRepository.findById(pedidoId);
+        if (pedidoOpt.isEmpty()) return Optional.empty();
+        Pedido pedido = pedidoOpt.get();
         pedido.setEstado(estado);
         if (estado == EstadoPedido.PAGADO) {
             pedido.setFechaPago(LocalDateTime.now());
         } else if (estado == EstadoPedido.ENVIADO) {
             pedido.setFechaEnvio(LocalDateTime.now());
         }
-        return pedidoRepository.save(pedido);
+
+        Pedido actualizado = pedidoRepository.save(pedido);
+        return Optional.of(pedidoMapper.toResponseDto(actualizado));
+    }
+
+    @Override
+    public List<PedidoResponseDto> obtenerPorEstado(EstadoPedido estado) {
+        return pedidoMapper.toResponseList(pedidoRepository.pedidosPorEstado(estado));
     }
 
     @Override

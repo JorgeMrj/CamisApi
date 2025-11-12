@@ -1,18 +1,51 @@
 package srangeldev.camisapi.rest.pedidos.services;
 
+import srangeldev.camisapi.rest.pedidos.dto.PedidoRequestDto;
+import srangeldev.camisapi.rest.pedidos.dto.PedidoResponseDto;
 import srangeldev.camisapi.rest.pedidos.models.EstadoPedido;
 import srangeldev.camisapi.rest.pedidos.models.Pedido;
 
 import java.util.List;
-
+import java.util.Optional;
+/**
+ * Servicio PedidoService
+ *
+ * Define las operaciones de negocio para la gestión de pedidos.
+ */
 public interface PedidoService {
 
-    Pedido crearPedido(Pedido pedido);
-    List<Pedido> listarPedidos();
-    Pedido obtenerPorId(Long id);
-    List<Pedido> obtenerPorUsuario(Long userId);
-    List<Pedido> obtenerPorEstado(EstadoPedido estado);
-    Pedido actualizarEstado(Long id, EstadoPedido estado);
-    void eliminarPedido(Long id);
+    /**
+     * Crea un nuevo pedido.
+     */
+    PedidoResponseDto crearPedido(PedidoRequestDto pedidoRequest);
 
+    /**
+     * Obtiene todos los pedidos.
+     */
+    List<PedidoResponseDto> listarPedidos();
+
+    /**
+     * Obtiene los pedidos por ID de usuario.
+     */
+    List<PedidoResponseDto> obtenerPorUsuario(Long userId);
+
+    /**
+     * Obtiene un pedido por su ID.
+     */
+    Optional<PedidoResponseDto> obtenerPorId(Long id);
+
+    /**
+     * Cambia el estado de un pedido (por ejemplo, de PENDIENTE_PAGO a PAGADO).
+     */
+    Optional<PedidoResponseDto> actualizarEstado(Long pedidoId, EstadoPedido estado);
+
+    /**
+     * Busca pedidos por estado.
+     */
+    List<PedidoResponseDto> obtenerPorEstado(EstadoPedido estado);
+
+    /**
+     * Eliminar Pedido.
+     */
+    void eliminarPedido(Long id);
 }
