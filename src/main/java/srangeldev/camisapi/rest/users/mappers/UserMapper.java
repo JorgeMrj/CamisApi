@@ -55,7 +55,7 @@ public class UserMapper {
         if (updateDto.getUsername() != null) {
             user.setUsername(updateDto.getUsername());
         }
-        if (updateDto.getRoles() != null) {
+        if (updateDto.getRoles() != null && !updateDto.getRoles().isEmpty()) {
             user.setRoles(updateDto.getRoles());
         }
         // La contraseña no se actualiza aquí
