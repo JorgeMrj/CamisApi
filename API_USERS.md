@@ -1,0 +1,5 @@
+- GET /api/v1/users: Devuelve una lista paginada y filtrada de usuarios.
+- GET /api/v1/users/{id}: Obtiene un usuario por su ID.
+- POST /api/v1/users: Crea un nuevo usuario.
+- PUT /api/v1/users/{id}: Actualiza un usuario existente.
+- DELETE /api/v1/users/{id}: Elimina un usuario (borrado lógico).

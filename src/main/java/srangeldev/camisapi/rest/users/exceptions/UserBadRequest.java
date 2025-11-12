@@ -1,4 +1,6 @@
-package srangeldev.camisapi.rest.usuarios.exceptions;
+package srangeldev.camisapi.rest.users.exceptions;
+
+import srangeldev.camisapi.rest.usuarios.exceptions.UserException;
 
 
 public class UserBadRequest extends UserException {

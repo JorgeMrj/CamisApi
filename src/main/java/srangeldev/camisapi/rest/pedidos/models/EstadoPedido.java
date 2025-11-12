@@ -1,7 +1,7 @@
 package srangeldev.camisapi.rest.pedidos.models;
 
 /**
- * 📦 Enum EstadoPedido
+ * Enum EstadoPedido
  * 
  * Define los estados posibles de un pedido en el sistema.
  * 

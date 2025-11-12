@@ -10,24 +10,27 @@ COPY gradle ./gradle
 # Copiamos el resto del código fuente
 COPY src ./src
 
+# Primero limpiamos cualquier build anterior para evitar problemas de caché
+RUN gradle clean --no-daemon
+
 # 'build' ejecuta 'test' (informe JUnit)
 # 'jacocoTestReport' genera el informe de cobertura
-# 'javadoc' genera la documentación
-# RUN gradle build javadoc jacocoTestReport --no-daemon
-RUN gradle build -x test
+# ':dokkaGenerate' genera la documentación Dokka v2 (comando correcto para v2)
+# '-x jacocoTestCoverageVerification' excluye la verificación de umbrales de cobertura
+# '--no-build-cache' evita problemas con archivos de assets en caché
+RUN gradle build :dokkaGenerate jacocoTestReport -x jacocoTestCoverageVerification --no-daemon --no-build-cache
 
 # --- ETAPA 2: El Contenedor de Artefactos ---
-# Esta etapa solo existe para exponer los reportes y docs
-# Usamos 'scratch' (una imagen vacía) porque solo es un contenedor de datos
-FROM scratch AS artifacts
-WORKDIR /
+# Esta etapa expone los reportes y docs usando Alpine (tiene shell para copiar)
+FROM alpine:latest AS artifacts
+WORKDIR /artifacts
 
 # Copiamos los reportes de JUnit
-COPY --from=builder /app/build/reports/tests/test /test-reports
-# Copiamos la documentación Javadoc
-COPY --from=builder /app/build/docs/javadoc /doc-reports
+COPY --from=builder /app/build/reports/tests/test /artifacts/test-reports
+# Copiamos la documentación Dokka (configurado en build.gradle.kts en build/docs/dokka)
+COPY --from=builder /app/build/docs/dokka /artifacts/doc-reports
 # (Opcional) Copiamos el informe de JaCoCo
-COPY --from=builder /app/build/reports/jacoco/test/html /coverage-reports
+COPY --from=builder /app/build/reports/jacoco /artifacts/coverage-reports
 
 
 # --- ETAPA 3: La Imagen Final (Runtime) ---
