@@ -5,6 +5,7 @@ plugins {
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco") // Plugin de Jacoco para test de cobertura
+    id("org.jetbrains.dokka") version "2.1.0"
 }
 
 group = "srangeldev"
@@ -107,6 +108,9 @@ tasks.withType<Javadoc> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    
+    // Usar perfil 'test' para los tests
+    systemProperty("spring.profiles.active", "test")
 
     testLogging {
         events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
@@ -213,3 +217,23 @@ tasks.jacocoTestCoverageVerification {
 tasks.check {
     dependsOn(tasks.jacocoTestCoverageVerification)
 }
+
+// Configuración de Dokka V2
+dokka {
+    // Configuración del plugin HTML con estilos personalizados
+    pluginsConfiguration.html {
+        // NUEVO archivo CSS para evitar caché
+        customStyleSheets.from("src/main/resources/assets/dokka-styles-new.css")
+        
+        // Assets personalizados (logo y otros recursos)
+        customAssets.from("src/main/resources/assets/my-logo.png")
+    }
+    
+    // Directorio de salida personalizado
+    dokkaPublications.html {
+        outputDirectory.set(layout.buildDirectory.dir("docs/dokka"))
+    }
+}
+
+// Para generar la documentación, ejecuta: ./gradlew :dokkaGenerate
+// o para solo HTML: ./gradlew :dokkaGeneratePublicationHtml

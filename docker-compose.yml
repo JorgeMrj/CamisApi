@@ -6,6 +6,7 @@ volumes:
   nginx-logs:
   test-reports-data:
   doc-reports-data:
+  coverage-reports-data:
   elasticsearch-data:
   mongodb-data:
   redis-data:
@@ -25,7 +26,7 @@ services:
     volumes:
       - test-reports-data:/mnt/test-reports
       - doc-reports-data:/mnt/doc-reports
-      - nginx-logs:/mnt/coverage-reports
+      - coverage-reports-data:/mnt/coverage-reports
 
   # --- Bases de Datos ---
   
@@ -128,6 +129,18 @@ services:
     depends_on:
       - artifacts-extractor
 
+  coverage-server:
+    image: nginx:alpine
+    container_name: coverage-server
+    expose:
+      - "80"
+    volumes:
+      - coverage-reports-data:/usr/share/nginx/html:ro
+    networks:
+      - app-network
+    depends_on:
+      - artifacts-extractor
+
   # --- B. SERVICIO DE ENTRADA (PROXY) ---
 
   proxy-nginx:
@@ -144,6 +157,7 @@ services:
       - api # <-- CAMBIO AQUÍ (depende del servicio 'api')
       - test-server
       - doc-server
+      - coverage-server
 
   # --- C. PILA DE OBSERVABILIDAD (EFK) ---
   # Comentado temporalmente hasta configurar fluentd.conf
