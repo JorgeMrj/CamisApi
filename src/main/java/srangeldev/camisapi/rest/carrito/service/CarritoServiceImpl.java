@@ -35,13 +35,13 @@ public class CarritoServiceImpl implements CarritoService{
 
     @Override
     public List<CarritoResponseDto> getAll() {
-        logger.info("Obteniendo todas las categorias");
+        logger.info("Obteniendo todas las carritos");
         return carritoRepository.findAll().stream().map(carritoMapper::toResponseDto).toList();
     }
 
     @Override
     public CarritoResponseDto getById(Long id) {
-        logger.info("Buscando categoria por id: " + id);
+        logger.info("Buscando carrito por id: " + id);
         Carrito carrito = carritoRepository.findById(id).orElseThrow(
                 () -> new CarritoNotFound(id)
         );
@@ -60,7 +60,7 @@ public class CarritoServiceImpl implements CarritoService{
             logger.info("Verificación de carrito existente: {}", existente.isPresent() ? "EXISTE" : "NO EXISTE");
 
             if (existente.isPresent()) {
-                logger.warn("Categoria ya existe con nombre: {}", carrito.getUserId());
+                logger.warn("Carrito ya existe con nombre: {}", carrito.getUserId());
                 throw new CarritoException("Ya existe una carrito con el id de usuario: " + carrito.getUserId()) {
                 };
             }
@@ -75,7 +75,7 @@ public class CarritoServiceImpl implements CarritoService{
 
             CarritoResponseDto response = carritoMapper.toResponseDto(guardada);
             logger.info("Response mapeada: {}", response);
-            logger.info("=== FIN SAVE CATEGORIA EXITOSO ===");
+            logger.info("=== FIN SAVE CARRITO EXITOSO ===");
 
             return response;
         } catch (Exception e) {
@@ -106,11 +106,10 @@ public class CarritoServiceImpl implements CarritoService{
 
     @Override
     public CarritoResponseDto delete(Long id) {
-        logger.info("Eliminando categoria con id: " + id);
+        logger.info("Eliminando carrito con id: " + id);
         Carrito borrada = carritoRepository.findById(id).orElseThrow(
                 () -> new CarritoNotFound(id)
         );
-
 
         carritoRepository.delete(borrada);
         return carritoMapper.toResponseDto(borrada);
@@ -120,7 +119,7 @@ public class CarritoServiceImpl implements CarritoService{
     public CarritoResponseDto findByUserId(Long userId) {
         logger.info("Buscando carrito por user id: " + userId);
         Carrito carrito = carritoRepository.findByUsuarioId(userId).orElseThrow(
-                () -> new CarritoBadId("No se encontro categoria con nombre: " + userId)
+                () -> new CarritoBadId("No se encontro carrito con nombre: " + userId)
         );
         return carritoMapper.toResponseDto(carrito);
     }
