@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
  * Actúa como una "foto" o snapshot del producto en el momento exacto de la compra.
  * 
  * ¿Por qué es necesario?
- * - Si el producto se modifica o elimina en MongoDB, el pedido seguirá siendo coherente
+ * Si el producto se modifica o elimina en PostgreSQL, el pedido seguirá siendo coherente
  * - Permite mantener un histórico exacto de lo que se vendió y a qué precio
  * - Garantiza que los datos del pedido no cambien aunque cambie el catálogo
  */
@@ -28,12 +28,12 @@ import lombok.NoArgsConstructor;
 public class DetallePedido {
     
     /**
-     * Referencia al ID del producto en MongoDB
+     * Referencia al ID del producto en PostgreSQL
      * Se mantiene para trazabilidad, aunque el producto puede ya no existir
      */
     @NotNull(message = "El ID del producto no puede ser nulo")
-    @Column(name = "producto_id", nullable = false, length = 24)
-    private String productoId;
+    @Column(name = "producto_id", nullable = false)
+    private Long productoId;
     
     /**
      * Nombre del producto en el momento de la venta

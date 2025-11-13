@@ -41,12 +41,12 @@ public class Pedido {
     private Long id;
     
     /**
-     * Referencia al ID del Usuario en PostgreSQL
-     * Se almacena el ID del User (Long)
+     * Referencia al ID del Usuario en MongoDB
+     * Se almacena el ID del User (String - ObjectId de MongoDB)
      */
     @NotNull(message = "El usuario no puede ser nulo")
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, length = 24)
+    private String userId;
     
     /**
      * Estado actual del pedido
@@ -80,7 +80,7 @@ public class Pedido {
      * Lista de detalles del pedido (productos vendidos)
      * Cada DetallePedido es un snapshot inmutable del producto vendido
      * 
-     * IMPORTANTE: Son copias de los datos, no referencias a MongoDB
+     * IMPORTANTE: Son copias de los datos, no referencias a PostgreSQL
      */
     @ElementCollection
     @CollectionTable(

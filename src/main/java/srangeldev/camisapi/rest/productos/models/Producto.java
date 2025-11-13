@@ -3,17 +3,21 @@ package srangeldev.camisapi.rest.productos.models;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.*;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 /**
- * Modelo Producto - MongoDB
+ * Modelo Producto - PostgreSQL (JPA)
  * 
  * Cada camiseta es ÚNICA, no hay control de stock ni unidades múltiples.
  * El campo `estado` es el núcleo del flujo de venta.
@@ -27,11 +31,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "productos")
+@Entity
+@Table(name = "productos")
 public class Producto {
 
     /**
-     * Identificador único del producto en MongoDB
+     * Identificador único del producto en PostgreSQL
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +48,7 @@ public class Producto {
      */
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 200, message = "El nombre no puede tener más de 200 caracteres")
+    @Column(nullable = false, length = 200)
     private String nombre;
 
     /**
@@ -51,6 +57,7 @@ public class Producto {
      */
     @NotBlank(message = "El equipo no puede estar vacío")
     @Size(max = 100, message = "El equipo no puede tener más de 100 caracteres")
+    @Column(nullable = false, length = 100)
     private String equipo;
 
     /**
@@ -60,12 +67,14 @@ public class Producto {
      */
     @NotBlank(message = "La talla no puede estar vacía")
     @Size(max = 10, message = "La talla no puede tener más de 10 caracteres")
+    @Column(nullable = false, length = 10)
     private String talla;
 
     /**
      * Descripción detallada del producto
      */
     @Size(max = 1000, message = "La descripción no puede tener más de 1000 caracteres")
+    @Column(length = 1000)
     private String descripcion;
 
     /**
@@ -73,6 +82,7 @@ public class Producto {
      */
     @NotNull(message = "El precio no puede ser nulo")
     @Positive(message = "El precio debe ser positivo")
+    @Column(nullable = false)
     private Double precio;
 
     /**

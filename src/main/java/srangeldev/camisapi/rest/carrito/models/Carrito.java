@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
+import srangeldev.camisapi.rest.productos.models.Producto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.List;
  * Es una entidad transaccional que garantiza la integridad de las reservas.
  * 
  * Comportamiento:
- * - Cuando se añade un producto, su estado cambia a RESERVADO en MongoDB
+ * - Cuando se añade un producto, su estado cambia a RESERVADO en PostgreSQL
  * - Si se elimina del carrito o expira, el producto vuelve a DISPONIBLE
  * - Los carritos pueden tener un tiempo de expiración para liberar productos
  */
@@ -39,27 +40,27 @@ public class Carrito {
     private Long id;
     
     /**
-     * Referencia al ID del Usuario en PostgreSQL
-     * Se almacena el ID del User (Long)
+     * Referencia al ID del Usuario en MongoDB
+     * Se almacena el ID del User (String - ObjectId de MongoDB)
      */
     @NotNull(message = "El usuario no puede ser nulo")
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, length = 24)
+    private String userId;
     
     /**
-     * Lista de IDs de productos (referencias a MongoDB)
-     * Cada elemento es el _id de un Producto en MongoDB
+     * Lista de productos en el carrito (relación @OneToMany)
+     * Relación unidireccional desde Carrito hacia Producto
      * 
-     * IMPORTANTE: Son referencias, no objetos completos
+     * IMPORTANTE: Se crea una tabla intermedia carrito_productos automáticamente
      */
-    @ElementCollection
-    @CollectionTable(
-        name = "carrito_items",
-        joinColumns = @JoinColumn(name = "carrito_id")
+    @OneToMany
+    @JoinTable(
+        name = "carrito_productos",
+        joinColumns = @JoinColumn(name = "carrito_id"),
+        inverseJoinColumns = @JoinColumn(name = "producto_id")
     )
-    @Column(name = "producto_id", length = 24)
     @Builder.Default
-    private List<String> items = new ArrayList<>();
+    private List<Producto> productos = new ArrayList<>();
     
     /**
      * Fecha de última modificación del carrito

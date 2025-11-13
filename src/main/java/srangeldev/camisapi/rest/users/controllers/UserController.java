@@ -40,12 +40,12 @@ public class UserController {
     ) {
         log.info("Buscando todos los usuarios con los siguientes filtros: username={}, email={}, isDeleted={}",
                 username.orElse("N/A"), email.orElse("N/A"), isDeleted.map(String::valueOf).orElse("N/A"));
-        List<UserResponseDto> users = userService.findAll(username, email, isDeleted);
+        List<UserResponseDto> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable String id) {
         log.info("Buscando usuario por id: {}", id);
         return ResponseEntity.ok(userService.findById(id));
     }
@@ -57,14 +57,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable String id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
         log.info("Actualizando usuario con id: {} y datos: {}", id, userUpdateRequestDto);
         return ResponseEntity.ok(userService.update(id, userUpdateRequestDto));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable String id) {
         log.info("Eliminando usuario con id: {}", id);
         userService.deleteById(id);
     }

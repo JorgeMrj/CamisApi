@@ -1,0 +1,448 @@
+/* ✨ TEMA HELLO KITTY KAWAII PARA DOKKA V2.1.0 ✨ */
+/* 🎀 VERSION FINAL - BONITO Y FUNCIONAL 🎀 */
+
+/* 🎀 Importar fuente de programación bonita - JetBrains Mono */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* 💖 Variables principales del tema Hello Kitty 💖 */
+:root {
+    /* Logo personalizado */
+    --dokka-logo-image-url: url('my-logo.png') !important;
+    
+    /* Colores Hello Kitty */
+    --kitty-pink: #FF6B9D !important;
+    --kitty-light-pink: #FFB3D9 !important;
+    --kitty-hot-pink: #FF1493 !important;
+    --kitty-cream: #FFF5F7 !important;
+    --kitty-pastel: #FFE4F0 !important;
+    --kitty-white: #FFFFFF !important;
+    --kitty-bow-red: #E60026 !important;
+    --kitty-dark: #2D1B2E !important;
+    --kitty-dark-pink: #4A2E4D !important;
+    
+    /* Sobrescribir variables nativas de Dokka */
+    --color-background-nav: var(--kitty-pink) !important;
+    --color-background-nav-dt: var(--kitty-pink) !important;
+    --color-background-page: var(--kitty-cream) !important;
+    --color-background-page-dt: var(--kitty-dark) !important;
+    --color-key-blue: var(--kitty-pink) !important;
+    --color-key-blue-hover: var(--kitty-hot-pink) !important;
+    --font-family-default: 'JetBrains Mono', monospace !important;
+    --font-family-mono: 'JetBrains Mono', monospace !important;
+}
+
+/* 🌈 Fondo principal kawaii */
+html body {
+    background: linear-gradient(135deg, var(--kitty-cream) 0%, var(--kitty-pastel) 100%) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    color: #5D4E60 !important;
+    line-height: 1.6 !important;
+}
+
+/* 🌙 Modo oscuro */
+html.theme-dark body {
+    background: linear-gradient(135deg, var(--kitty-dark) 0%, var(--kitty-dark-pink) 100%) !important;
+    color: var(--kitty-light-pink) !important;
+}
+
+/* 🎯 Header/Navegación con degradado rosa kawaii */
+.navigation,
+.navigation.theme-dark,
+#navigation-wrapper.navigation.theme-dark,
+header.navigation {
+    background: linear-gradient(90deg, var(--kitty-pink) 0%, var(--kitty-hot-pink) 100%) !important;
+    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.3) !important;
+    border-bottom: none !important;
+}
+
+/* 💕 Nombre de la librería con logo personalizado */
+.library-name--link {
+    color: var(--kitty-white) !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.library-name--link::before {
+    content: "";
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    background-image: url('my-logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.library-name--link:hover {
+    transform: scale(1.05) !important;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 🎀 Versión de la librería kawaii */
+.library-version {
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: var(--kitty-white) !important;
+    border-radius: 20px !important;
+    padding: 6px 16px !important;
+    font-weight: 600 !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 🌸 Botones de navegación kawaii */
+.navigation-controls--btn {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease !important;
+    color: var(--kitty-white) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.navigation-controls--btn:hover {
+    background: rgba(255, 255, 255, 0.35) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 🎀 Títulos kawaii con logos personalizados */
+h1, h2, h3, h4, h5, h6, h1.cover {
+    color: var(--kitty-hot-pink) !important;
+    font-weight: 700 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    text-shadow: 2px 2px 4px rgba(255, 107, 157, 0.2) !important;
+    margin-top: 2rem !important;
+    margin-bottom: 1rem !important;
+}
+
+h1.cover {
+    font-size: 3rem !important;
+    background: linear-gradient(45deg, var(--kitty-hot-pink), var(--kitty-bow-red)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+h1::before, h2::before {
+    content: "";
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background-image: url('my-logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-right: 12px;
+    vertical-align: middle;
+    filter: drop-shadow(1px 1px 2px rgba(255, 107, 157, 0.3));
+}
+
+/* Modo oscuro para títulos */
+html.theme-dark h1, 
+html.theme-dark h2, 
+html.theme-dark h3, 
+html.theme-dark h4, 
+html.theme-dark h5, 
+html.theme-dark h6, 
+html.theme-dark h1.cover {
+    color: var(--kitty-light-pink) !important;
+    text-shadow: 2px 2px 4px rgba(255, 179, 217, 0.2) !important;
+}
+
+html.theme-dark h1.cover {
+    background: linear-gradient(45deg, var(--kitty-light-pink), var(--kitty-pink)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* 💻 Fuente kawaii para todo */
+html, html body, html * {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace !important;
+}
+
+/* 🌸 Enlaces kawaii con efectos suaves */
+a {
+    color: var(--kitty-pink) !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    border-radius: 4px !important;
+    padding: 2px 4px !important;
+}
+
+a:hover {
+    color: var(--kitty-hot-pink) !important;
+    background: rgba(255, 107, 157, 0.1) !important;
+    text-shadow: 0 0 8px rgba(255, 107, 157, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+html.theme-dark a {
+    color: var(--kitty-light-pink) !important;
+}
+
+html.theme-dark a:hover {
+    color: var(--kitty-white) !important;
+    background: rgba(255, 179, 217, 0.15) !important;
+}
+
+/* 🎨 Tags de plataforma kawaii */
+.platform-tag.jvm-like,
+.platform-tag {
+    background: linear-gradient(135deg, var(--kitty-light-pink), var(--kitty-pink)) !important;
+    color: var(--kitty-white) !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    padding: 6px 16px !important;
+    box-shadow: 0 3px 6px rgba(255, 107, 157, 0.3) !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+}
+
+.platform-tag:hover {
+    transform: scale(1.05) translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(255, 107, 157, 0.4) !important;
+}
+
+/* 💝 Sidebar kawaii con cristal esmerilado */
+.sidebar {
+    background: rgba(255, 245, 247, 0.9) !important;
+    backdrop-filter: blur(15px) !important;
+    border-right: 3px solid rgba(255, 107, 157, 0.3) !important;
+    box-shadow: 4px 0 20px rgba(255, 107, 157, 0.1) !important;
+}
+
+html.theme-dark .sidebar {
+    background: rgba(45, 27, 46, 0.9) !important;
+    border-right: 3px solid rgba(139, 71, 137, 0.5) !important;
+}
+
+/* 🌟 Contenido principal con efecto cristal */
+.main-content {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 16px !important;
+    padding: 2.5rem !important;
+    margin: 1rem !important;
+    box-shadow: 0 8px 32px rgba(255, 107, 157, 0.1) !important;
+    border: 1px solid rgba(255, 107, 157, 0.2) !important;
+}
+
+html.theme-dark .main-content {
+    background: rgba(45, 27, 46, 0.8) !important;
+    border-color: rgba(139, 71, 137, 0.3) !important;
+}
+
+/* 🌈 Tablas kawaii */
+.table {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 16px rgba(255, 107, 157, 0.1) !important;
+}
+
+.table-row {
+    border-bottom: 1px solid rgba(255, 107, 157, 0.1) !important;
+    transition: all 0.3s ease !important;
+    padding: 1rem !important;
+}
+
+.table-row:hover {
+    background: linear-gradient(to right, rgba(255, 245, 247, 0.8), rgba(255, 228, 240, 0.8)) !important;
+    transform: translateX(8px) !important;
+    box-shadow: -4px 0 12px rgba(255, 107, 157, 0.15) !important;
+}
+
+html.theme-dark .table-row {
+    border-bottom-color: rgba(139, 71, 137, 0.2) !important;
+}
+
+html.theme-dark .table-row:hover {
+    background: linear-gradient(to right, rgba(74, 46, 77, 0.6), rgba(107, 74, 110, 0.6)) !important;
+}
+
+/* ⭐ Footer */
+.footer {
+    background: linear-gradient(135deg, var(--kitty-cream), var(--kitty-pastel)) !important;
+    border-top: 3px solid var(--kitty-pastel) !important;
+}
+
+/* 🎪 Botones */
+button, .button {
+    background: linear-gradient(135deg, var(--kitty-pink), var(--kitty-hot-pink)) !important;
+    color: #FFFFFF !important;
+    border-radius: 20px !important;
+    border: none !important;
+}
+
+/* 🌈 Modo oscuro */
+html.theme-dark body {
+    background: linear-gradient(135deg, var(--kitty-dark) 0%, #4A2E4D 100%) !important;
+    border-color: var(--kitty-pink) !important;
+}
+
+html.theme-dark .sidebar {
+    background: rgba(45, 27, 46, 0.95) !important;
+    border-right-color: #8B4789 !important;
+}
+
+html.theme-dark .main-content {
+    background: rgba(45, 27, 46, 0.8) !important;
+}
+
+html.theme-dark h1, html.theme-dark h2, html.theme-dark h1.cover {
+    color: #FFB3D9 !important;
+}
+
+html.theme-dark a {
+    color: #FFB3D9 !important;
+}
+
+/* ⭐ Footer kawaii */
+.footer {
+    background: linear-gradient(135deg, var(--kitty-cream), var(--kitty-pastel)) !important;
+    border-top: 3px solid rgba(255, 107, 157, 0.3) !important;
+    padding: 2rem !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+html.theme-dark .footer {
+    background: linear-gradient(135deg, var(--kitty-dark), var(--kitty-dark-pink)) !important;
+    border-top-color: rgba(139, 71, 137, 0.5) !important;
+}
+
+.footer--link {
+    color: var(--kitty-pink) !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.footer--link:hover {
+    color: var(--kitty-hot-pink) !important;
+    text-shadow: 0 0 8px rgba(255, 107, 157, 0.5) !important;
+}
+
+/* 🎪 Botones kawaii */
+button, .button {
+    background: linear-gradient(135deg, var(--kitty-pink), var(--kitty-hot-pink)) !important;
+    color: var(--kitty-white) !important;
+    border-radius: 25px !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3) !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+button:hover, .button:hover {
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4) !important;
+    background: linear-gradient(135deg, var(--kitty-hot-pink), var(--kitty-bow-red)) !important;
+}
+
+/* 🎯 Botón "Go to top" especial */
+.footer--button_go-to-top {
+    background: linear-gradient(135deg, var(--kitty-bow-red), var(--kitty-hot-pink)) !important;
+    border-radius: 50% !important;
+    width: 50px !important;
+    height: 50px !important;
+    box-shadow: 0 6px 20px rgba(230, 0, 38, 0.4) !important;
+}
+
+.footer--button_go-to-top:hover {
+    transform: translateY(-5px) scale(1.15) rotate(360deg) !important;
+    box-shadow: 0 10px 25px rgba(230, 0, 38, 0.6) !important;
+}
+
+/* 💻 Bloques de código kawaii */
+pre, code {
+    background: linear-gradient(to right, rgba(255, 240, 245, 0.9), rgba(255, 228, 240, 0.9)) !important;
+    border: 2px solid rgba(255, 107, 157, 0.2) !important;
+    border-radius: 12px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.1) !important;
+}
+
+pre {
+    padding: 1.5rem !important;
+    border-left: 4px solid var(--kitty-pink) !important;
+}
+
+code {
+    padding: 0.3rem 0.6rem !important;
+    font-weight: 500 !important;
+}
+
+html.theme-dark pre, html.theme-dark code {
+    background: linear-gradient(to right, rgba(61, 45, 62, 0.9), rgba(74, 46, 77, 0.9)) !important;
+    border-color: rgba(139, 71, 137, 0.3) !important;
+}
+
+/* ✨ Scrollbar kawaii */
+::-webkit-scrollbar {
+    width: 14px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--kitty-cream) !important;
+    border-radius: 10px !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--kitty-pink), var(--kitty-hot-pink)) !important;
+    border-radius: 10px !important;
+    border: 2px solid var(--kitty-cream) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--kitty-hot-pink), var(--kitty-bow-red)) !important;
+}
+
+html.theme-dark ::-webkit-scrollbar-track {
+    background: var(--kitty-dark) !important;
+}
+
+html.theme-dark ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--kitty-light-pink), var(--kitty-pink)) !important;
+    border-color: var(--kitty-dark) !important;
+}
+
+/* 🌸 Breadcrumbs kawaii */
+.breadcrumbs {
+    color: var(--kitty-pink) !important;
+    font-weight: 500 !important;
+    margin-bottom: 2rem !important;
+}
+
+.breadcrumbs a {
+    color: var(--kitty-pink) !important;
+    transition: all 0.3s ease !important;
+}
+
+.breadcrumbs a:hover {
+    color: var(--kitty-hot-pink) !important;
+    transform: scale(1.05) !important;
+}
+
+/* 💫 Animaciones kawaii */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.library-name--link {
+    animation: float 4s ease-in-out infinite !important;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.platform-tag {
+    animation: sparkle 3s ease-in-out infinite !important;
+}
