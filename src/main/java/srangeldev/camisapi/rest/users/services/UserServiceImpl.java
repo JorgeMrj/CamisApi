@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import srangeldev.camisapi.rest.users.dto.UserCreateRequestDto;
 import srangeldev.camisapi.rest.users.dto.UserResponseDto;
 import srangeldev.camisapi.rest.users.dto.UserUpdateRequestDto;
@@ -18,6 +19,7 @@ import srangeldev.camisapi.rest.users.mappers.UserMapper;
 import srangeldev.camisapi.rest.users.models.User;
 import srangeldev.camisapi.rest.users.repositories.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,26 +38,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponseDto> findAll(Optional<String> username, Optional<String> email, Optional<Boolean> isDeleted) {
-        log.info("Obteniendo todos los usuarios con username: {}, email: {} e isDeleted: {}", username, email, isDeleted);
-        
-        // Aplicamos filtros según los parámetros proporcionados
-        List<User> users;
-        
-        if (username.isPresent() && isDeleted.isPresent()) {
-            // Filtro por username y isDeleted
-            users = userRepository.findByUsernameContainingIgnoreCaseAndIsDeleted(username.get(), isDeleted.get());
-        } else if (username.isPresent()) {
-            // Solo filtro por username
-            users = userRepository.findByUsernameContainingIgnoreCase(username.get());
-        } else if (isDeleted.isPresent()) {
-            // Solo filtro por isDeleted
-            users = userRepository.findByIsDeleted(isDeleted.get());
-        } else {
-            // Sin filtros, devolvemos todos
-            users = userRepository.findAll();
-        }
-
+    public List<UserResponseDto> findAll() {
+        List<User> users = new ArrayList<>();
+        userRepository.findAll().forEach(users::add);
         return users.stream()
                 .map(userMapper::toUsuarioResponseDto)
                 .toList();
@@ -63,101 +48,55 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(key = "#id")
-    public UserResponseDto findById(Long id) {
-        log.info("Obteniendo usuario con id: {}", id);
-        return userRepository.findById(id)
-                .map(userMapper::toUsuarioResponseDto)
-                .orElseThrow();
+    public UserResponseDto findById(String id) {
+        log.info("Buscando usuario por id: {}", id);
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado"));
+        return userMapper.toUsuarioResponseDto(user);
     }
 
     @Override
-    @Transactional
     @CachePut(key = "#result.id")
     public UserResponseDto save(UserCreateRequestDto userCreateRequestDto) {
         log.info("Guardando usuario: {}", userCreateRequestDto);
-        
-        // Comprobamos el usuario y sus datos
-        checkUserCreate(userCreateRequestDto);
-
-        // Mapeamos el DTO a la entidad
+        userRepository.findByUsernameIgnoreCase(userCreateRequestDto.getUsername()).ifPresent(u -> {
+            throw new UserBadRequest("Ya existe un usuario con el username " + userCreateRequestDto.getUsername());
+        });
         User user = userMapper.toUsuario(userCreateRequestDto);
-        
-        // Ciframos la contraseña
         user.setPassword(user.getPassword());
-
-        // Guardamos el usuario en la base de datos
-        var userGuardado = userRepository.save(user);
-
-        return userMapper.toUsuarioResponseDto(userGuardado);
+        return userMapper.toUsuarioResponseDto(userRepository.save(user));
     }
 
     @Override
-    @Transactional
     @CachePut(key = "#id")
-    public UserResponseDto update(Long id, UserUpdateRequestDto userUpdateRequestDto) {
-        log.info("Actualizando usuario con id: {}", id);
-        
-        // Primero lo buscamos
-        var userToUpdate = userRepository.findById(id)
-                .orElseThrow();
+    public UserResponseDto update(String id, UserUpdateRequestDto userUpdateRequestDto) {
+        log.info("Actualizando usuario con id {}: {}", id, userUpdateRequestDto);
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado"));
 
-        // Comprobamos el usuario y sus datos
-        checkUserUpdate(id, userUpdateRequestDto);
+        if (userUpdateRequestDto.getUsername() != null && !userUpdateRequestDto.getUsername().isEmpty() && !userUpdateRequestDto.getUsername().equals(existingUser.getUsername())) {
+            userRepository.findByUsernameIgnoreCase(userUpdateRequestDto.getUsername()).ifPresent(u -> {
+                throw new UserBadRequest("Ya existe un usuario con el username " + userUpdateRequestDto.getUsername());
+            });
+            existingUser.setUsername(userUpdateRequestDto.getUsername());
+        }
 
-        // Actualizamos los datos del usuario
-        var userUpdated = userMapper.toUsuario(userUpdateRequestDto, userToUpdate);
-        
-        // Guardamos el usuario actualizado en la base de datos
-        return userMapper.toUsuarioResponseDto(userRepository.save(userUpdated));
+        if (userUpdateRequestDto.getUsername() != null && !userUpdateRequestDto.getUsername().isEmpty()) {
+            existingUser.setUsername(userUpdateRequestDto.getUsername());
+        }
+        if (userUpdateRequestDto.getNombre() != null && !userUpdateRequestDto.getNombre().isEmpty()) {
+            existingUser.setNombre(userUpdateRequestDto.getNombre());
+        }
+        if (userUpdateRequestDto.getRoles() != null && !userUpdateRequestDto.getRoles().isEmpty()) {
+            existingUser.setRoles(userUpdateRequestDto.getRoles());
+        }
+
+        return userMapper.toUsuarioResponseDto(userRepository.save(existingUser));
     }
 
     @Override
-    @Transactional
     @CacheEvict(key = "#id")
-    public void deleteById(Long id) {
-        log.info("Borrando usuario con id: {}", id);
-        
-        // Lo primero que tenemos que ver es si existe el usuario
-        // Si no existe, lanzamos una excepción
-        var userToDelete = userRepository.findById(id)
-                .orElseThrow();
-        
-        // Realizamos el borrado lógico
-        userRepository.updateIsDeletedById(id, true);
-    }
-
-    /**
-     * Método privado para validar los datos del usuario al crear
-     *
-     * @param userCreateRequestDto DTO con los datos del nuevo usuario
-     */
-    void checkUserCreate(UserCreateRequestDto userCreateRequestDto) {
-        log.info("Comprobando usuario: {}", userCreateRequestDto);
-        
-        // Comprobamos si ya existe un usuario con ese username
-        userRepository.findByUsernameIgnoreCase(userCreateRequestDto.getUsername())
-                .ifPresent(u -> {
-                    throw new UserBadRequest("Ya existe un usuario con el username: " + userCreateRequestDto.getUsername());
-                });
-    }
-
-    /**
-     * Método privado para validar los datos del usuario al actualizar
-     *
-     * @param id                   ID del usuario a actualizar
-     * @param userUpdateRequestDto DTO con los datos del usuario
-     */
-    void checkUserUpdate(Long id, UserUpdateRequestDto userUpdateRequestDto) {
-        log.info("Validando usuario con id: {}", id);
-        
-        // Comprobar si el nuevo username ya existe en otro usuario
-        if (userUpdateRequestDto.getUsername() != null && !userUpdateRequestDto.getUsername().isEmpty()) {
-            userRepository.findByUsernameIgnoreCase(userUpdateRequestDto.getUsername())
-                    .ifPresent(existingUser -> {
-                        if (!existingUser.getId().equals(id)) {
-                            throw new UserBadRequest("El username '" + userUpdateRequestDto.getUsername() + "' ya está en uso por otro usuario.");
-                        }
-                    });
-        }
+    public void deleteById(String id) {
+        log.info("Borrando usuario por id: {}", id);
+        userRepository.findById(id).orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado"));
+        userRepository.deleteById(id);
     }
 }

@@ -63,7 +63,6 @@ public interface UserRepository extends MongoRepository<User, String> {
      * o implementamos este método personalizado.
      *
      * @param id        ID del usuario
-     * @param isDeleted true si se quiere marcar como borrado, false en caso contrario
      */
     @Query("{'_id': ?0}")
     Optional<User> findByIdForUpdate(String id);

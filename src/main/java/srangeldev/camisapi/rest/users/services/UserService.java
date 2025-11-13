@@ -11,12 +11,9 @@ public interface UserService {
     /**
      * Busca todos los usuarios.
      *
-     * @param username  Opcional: filtra por nombre de usuario.
-     * @param email     Opcional: filtra por email.
-     * @param isDeleted Opcional: filtra por estado de borrado.
      * @return Lista de DTOs de respuesta de usuario.
      */
-    List<UserResponseDto> findAll(Optional<String> username, Optional<String> email, Optional<Boolean> isDeleted);
+    List<UserResponseDto> findAll();
 
     /**
      * Busca un usuario por su ID.
@@ -24,7 +21,7 @@ public interface UserService {
      * @param id ID del usuario.
      * @return DTO de respuesta del usuario.
      */
-    UserResponseDto findById(Long id);
+    UserResponseDto findById(String id);
 
     /**
      * Guarda un nuevo usuario.
@@ -41,12 +38,12 @@ public interface UserService {
      * @param userUpdateRequestDto DTO con los datos a actualizar.
      * @return DTO de respuesta del usuario actualizado.
      */
-    UserResponseDto update(Long id, UserUpdateRequestDto userUpdateRequestDto);
+    UserResponseDto update(String id, UserUpdateRequestDto userUpdateRequestDto);
 
     /**
      * Elimina un usuario por su ID (borrado lógico).
      *
      * @param id ID del usuario a eliminar.
      */
-    void deleteById(Long id);
+    void deleteById(String id);
 }
