@@ -27,13 +27,13 @@ public class CarritoRestController {
 
     @GetMapping("")
     public ResponseEntity<List<CarritoResponseDto>> getAll() {
-        logger.info("Obteniendo categorias");
+        logger.info("Obteniendo carrito");
         return ResponseEntity.ok(carritoService.getAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CarritoResponseDto> getById(@PathVariable Long id) {
-        logger.info("Obteniendo categoria con id: " + id);
+        logger.info("Obteniendo carrito con id: " + id);
         return ResponseEntity.ok(carritoService.getById(id));
     }
 
@@ -45,21 +45,21 @@ public class CarritoRestController {
 
     @PostMapping("")
     public ResponseEntity<CarritoResponseDto> save(@Valid @RequestBody CarritoCreateRequestDto carrito) {
-        logger.info("Recibida petición POST para crear categoria: {}", carrito);
+        logger.info("Recibida petición POST para crear carrito: {}", carrito);
         try {
             CarritoResponseDto response = carritoService.save(carrito);
-            logger.info("Categoria creada exitosamente con id: {}", response.getId());
+            logger.info("carrito creada exitosamente con id: {}", response.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            logger.error("Error al crear categoria: {}", e.getMessage(), e);
+            logger.error("Error al crear carrito: {}", e.getMessage(), e);
             throw e;
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CarritoResponseDto> update(@PathVariable Long id, @Valid @RequestBody CarritoUpdateRequestDto categoria) {
+    public ResponseEntity<CarritoResponseDto> update(@PathVariable Long id, @Valid @RequestBody CarritoUpdateRequestDto carrito) {
         logger.info("Actualizando Carrito con id: " + id);
-        return ResponseEntity.ok(carritoService.update(id, categoria));
+        return ResponseEntity.ok(carritoService.update(id, carrito));
     }
 
     @DeleteMapping("/{id}")
