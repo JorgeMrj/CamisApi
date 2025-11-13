@@ -37,8 +37,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDto> findAll() {
-        List<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
+        List<User> users = new ArrayList<>(userRepository.findAll());
         return users.stream()
                 .map(userMapper::toUsuarioResponseDto)
                 .toList();
