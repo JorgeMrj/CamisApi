@@ -21,7 +21,6 @@ services:
       dockerfile: Dockerfile
       target: artifacts
     container_name: artifacts-extractor
-    command: sh -c "cp -r /artifacts/test-reports/* /mnt/test-reports/ && cp -r /artifacts/doc-reports/* /mnt/doc-reports/ && cp -r /artifacts/coverage-reports/* /mnt/coverage-reports/ && sleep infinity"
     volumes:
       - test-reports-data:/mnt/test-reports
       - doc-reports-data:/mnt/doc-reports

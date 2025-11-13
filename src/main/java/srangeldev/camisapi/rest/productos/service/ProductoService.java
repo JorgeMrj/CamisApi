@@ -33,7 +33,6 @@ public class ProductoService {
             producto.setFechaCreacion(LocalDateTime.now());
         }
 
-        producto.validarNegocio();
         Producto guardado = productoRepository.save(producto);
         return productoMapper.toDTO(guardado);
     }
@@ -72,8 +71,6 @@ public class ProductoService {
         existente.setPrecio(dto.getPrecio());
         existente.setImageUrl(dto.getImageUrl());
         existente.setEstado(dto.getEstado());
-
-        existente.validarNegocio();
 
         Producto actualizado = productoRepository.save(existente);
         return productoMapper.toDTO(actualizado);
@@ -114,6 +111,13 @@ public class ProductoService {
      */
     public List<ProductoResponseDTO> buscarPorEstado(EstadoProducto estado) {
         return productoRepository.findByEstado(estado)
+                .stream()
+                .map(productoMapper::toDTO)
+                .toList();
+    }
+
+    public List<ProductoResponseDTO> buscarPorTalla(String talla) {
+        return productoRepository.findByTalla(talla)
                 .stream()
                 .map(productoMapper::toDTO)
                 .toList();

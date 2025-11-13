@@ -98,18 +98,4 @@ public class Producto {
      */
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
     private LocalDateTime fechaCreacion;
-
-    /**
-     * - Si el estado es VENDIDO, precio y fechaCreacion no deben ser nulos
-     */
-    public void validarNegocio() {
-        if (estado == EstadoProducto.VENDIDO) {
-            if (precio == null || precio <= 0) {
-                throw new IllegalArgumentException("Un producto vendido debe tener un precio válido");
-            }
-            if (fechaCreacion == null) {
-                throw new IllegalArgumentException("Un producto vendido debe tener fecha de creación");
-            }
-        }
-    }
 }

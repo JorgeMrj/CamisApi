@@ -96,5 +96,11 @@ public class ProductoController {
         List<ProductoResponseDTO> resultados = productoService.buscarPorEstado(estado);
         return ResponseEntity.ok(resultados);
     }
+
+    @GetMapping("/buscar/talla")
+    public ResponseEntity<List<ProductoResponseDTO>> buscarPorTalla(@RequestParam String talla) {
+        List<ProductoResponseDTO> resultados = productoService.buscarPorTalla(talla);
+        return ResponseEntity.ok(resultados);
+    }
 }
 
