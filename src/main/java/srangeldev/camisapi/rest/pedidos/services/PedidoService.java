@@ -27,17 +27,17 @@ public interface PedidoService {
     /**
      * Obtiene los pedidos por ID de usuario.
      */
-    List<PedidoResponseDto> obtenerPorUsuario(String userId);
+    List<PedidoResponseDto> obtenerPorUsuario(Long userId);
 
     /**
      * Obtiene un pedido por su ID.
      */
-    Optional<PedidoResponseDto> obtenerPorId(Long id);
+    PedidoResponseDto obtenerPorId(Long pedidoId);
 
     /**
      * Cambia el estado de un pedido (por ejemplo, de PENDIENTE_PAGO a PAGADO).
      */
-    Optional<PedidoResponseDto> actualizarEstado(Long pedidoId, EstadoPedido estado);
+    PedidoResponseDto actualizarEstado(Long id, EstadoPedido estado);
 
     /**
      * Busca pedidos por estado.

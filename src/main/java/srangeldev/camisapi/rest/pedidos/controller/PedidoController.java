@@ -1,11 +1,15 @@
 package srangeldev.camisapi.rest.pedidos.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import srangeldev.camisapi.rest.pedidos.dto.PedidoRequestDto;
 import srangeldev.camisapi.rest.pedidos.dto.PedidoResponseDto;
 import srangeldev.camisapi.rest.pedidos.models.EstadoPedido;
 import srangeldev.camisapi.rest.pedidos.services.PedidoService;
+import jakarta.validation.Valid;
+
 
 import java.util.List;
 
@@ -42,16 +46,15 @@ public class PedidoController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDto> obtenerPedido(@PathVariable Long id) {
-        return pedidoService.obtenerPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        PedidoResponseDto pedido = pedidoService.obtenerPorId(id);
+        return ResponseEntity.ok(pedido);
     }
 
     /**
      * Obtiene pedidos por el ID del usuario (String, MongoDB)
      */
     @GetMapping("/usuario/{userId}")
-    public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorUsuario(@PathVariable String userId) {
+    public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorUsuario(@PathVariable Long userId) {
         List<PedidoResponseDto> pedidos = pedidoService.obtenerPorUsuario(userId);
         return ResponseEntity.ok(pedidos);
     }
@@ -73,9 +76,7 @@ public class PedidoController {
             @PathVariable Long id,
             @RequestParam EstadoPedido estado
     ) {
-        return pedidoService.actualizarEstado(id, estado)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(pedidoService.actualizarEstado(id, estado));
     }
 
     /**

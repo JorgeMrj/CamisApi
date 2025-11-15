@@ -46,7 +46,7 @@ public class Pedido {
      */
     @NotNull(message = "El usuario no puede ser nulo")
     @Column(name = "user_id", nullable = false, length = 24)
-    private String userId;
+    private Long userId;
     
     /**
      * Estado actual del pedido

@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DetallePedidoDto {
     @NotNull(message = "El ID del producto no puede ser nulo")
-    private Long productoId;
+    private String productoId;
 
     @NotBlank(message = "El nombre no puede estar vacío")
     private String nombre;

@@ -23,7 +23,7 @@ import java.util.List;
 public class PedidoResponseDto {
 
     private Long id;
-    private String userId;
+    private Long userId;
     private EstadoPedido estado;
     private LocalDateTime createdAt;
     private Double total;
@@ -31,7 +31,4 @@ public class PedidoResponseDto {
     private LocalDateTime fechaEnvio;
 
     private List<DetallePedidoDto> detalles;
-
-
-
 }

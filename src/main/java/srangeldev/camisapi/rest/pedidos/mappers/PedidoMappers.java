@@ -28,23 +28,6 @@ public class PedidoMappers {
                         .collect(Collectors.toList()))
                 .build();
     }
-    /**
-     * Convierte  DetallePedidoDto a la entidad  DetallePedido.
-     * Utilizado al crear un pedido nuevo a partir de los datos enviados por el usuario.
-     *
-     * @param dto el detalle del pedido en formato DTO.
-     * @return una instancia de DetallePedido con sus datos correspondientes.
-     */
-    public DetallePedido toDetallePedido(DetallePedidoDto dto) {
-        return DetallePedido.builder()
-                .productoId(dto.getProductoId())
-                .nombre(dto.getNombre())
-                .talla(dto.getTalla())
-                .equipo(dto.getEquipo())
-                .precioPagado(dto.getPrecioPagado())
-                .imageUrl(dto.getImageUrl())
-                .build();
-    }
 
     /**
      * Convierte la entidad Pedido a PedidoResponseDto.
@@ -68,8 +51,25 @@ public class PedidoMappers {
         );
     }
     /**
+     * Convierte  DetallePedidoDto a la entidad  DetallePedido.
+     * Utilizado al crear un pedido nuevo a partir de los datos enviados por el usuario.
+     *
+     * @param dto el detalle del pedido en formato DTO.
+     * @return una instancia de DetallePedido con sus datos correspondientes.
+     */
+    public DetallePedido toDetallePedido(DetallePedidoDto dto) {
+        return DetallePedido.builder()
+                .productoId(dto.getProductoId())
+                .nombre(dto.getNombre())
+                .talla(dto.getTalla())
+                .equipo(dto.getEquipo())
+                .precioPagado(dto.getPrecioPagado())
+                .imageUrl(dto.getImageUrl())
+                .build();
+    }
+
+    /**
      * Convierte la entidad DetallePedido aDetallePedidoDto.
-     * Se usa en conjunto con #toResponseDto(Pedido)}.
      *
      * @param entity la entidad de detalle del pedido.
      * @return el DTO equivalente del detalle del pedido.

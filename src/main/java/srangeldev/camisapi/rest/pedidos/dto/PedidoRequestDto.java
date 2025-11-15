@@ -26,7 +26,7 @@ import java.util.List;
 @Data
 public class PedidoRequestDto {
     @NotNull(message = "El usuario no puede ser nulo")
-    private String userId;
+    private Long userId;
 
     @NotNull(message = "El total no puede ser nulo")
     @Positive(message = "El total debe ser mayor que 0")
