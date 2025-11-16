@@ -1,0 +1,92 @@
+# Schema GraphQL para el módulo de Carrito
+# Fecha: 2025-11-16
+
+# ===============================
+# TIPOS DE DATOS
+# ===============================
+
+# Tipo principal Carrito
+type Carrito {
+    id: ID!
+    userId: ID!
+    items: [String!]!
+    totalItems: Int!
+    modificadoEn: String!
+    creadoEn: String!
+}
+
+# ===============================
+# INPUTS PARA MUTACIONES
+# ===============================
+
+# Input para crear un nuevo carrito
+input CarritoCreateInput {
+    userId: ID!
+    items: [String!] = []
+}
+
+# Input para actualizar un carrito existente
+input CarritoUpdateInput {
+    items: [String!]
+}
+
+# Input para agregar un item al carrito
+input CarritoAddItemInput {
+    carritoId: ID!
+    itemId: String!
+}
+
+# Input para remover un item del carrito
+input CarritoRemoveItemInput {
+    carritoId: ID!
+    itemId: String!
+}
+
+# ===============================
+# CONSULTAS (QUERIES)
+# ===============================
+
+type Query {
+    # Obtener todos los carritos
+    carritos: [Carrito!]!
+
+    # Obtener carrito por ID
+    carrito(id: ID!): Carrito
+
+    # Obtener carrito por ID de usuario
+    carritoByUserId(userId: ID!): Carrito
+}
+
+# ===============================
+# MUTACIONES (MUTATIONS)
+# ===============================
+
+type Mutation {
+    # Crear un nuevo carrito
+    crearCarrito(input: CarritoCreateInput!): Carrito!
+
+    # Actualizar carrito existente
+    actualizarCarrito(id: ID!, input: CarritoUpdateInput!): Carrito!
+
+    # Agregar item al carrito
+    agregarItemCarrito(input: CarritoAddItemInput!): Carrito!
+
+    # Remover item del carrito
+    removerItemCarrito(input: CarritoRemoveItemInput!): Carrito!
+
+    # Eliminar carrito
+    eliminarCarrito(id: ID!): Carrito!
+
+    # Vaciar carrito (eliminar todos los items)
+    vaciarCarrito(id: ID!): Carrito!
+}
+
+# ===============================
+# TIPOS DE ERROR
+# ===============================
+
+# Extensión para manejo de errores personalizado
+extend type Carrito {
+    # Validaciones adicionales si son necesarias
+    isValid: Boolean!
+}
