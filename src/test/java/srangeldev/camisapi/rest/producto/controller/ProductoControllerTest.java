@@ -30,11 +30,12 @@ class ProductoControllerTest {
     private ProductoController productoController;
 
     private final ProductoResponseDTO productoResponse = ProductoResponseDTO.builder()
-            .id(1L)
+            .id("1")
             .nombre("Camiseta Real Madrid")
             .equipo("Real Madrid")
             .precio(49.99)
             .estado(EstadoProducto.DISPONIBLE)
+            .talla("S")
             .build();;
 
     private final ProductoRequestDTO productoRequest = ProductoRequestDTO.builder()
@@ -45,6 +46,7 @@ class ProductoControllerTest {
             .precio(89.99)
             .imageUrl("https://miweb.com/img/real-madrid-2025.png")
             .estado(EstadoProducto.DISPONIBLE)
+            .talla("L")
             .build();
 
 
@@ -93,16 +95,16 @@ class ProductoControllerTest {
         @Test
         @DisplayName("Debe obtener un producto por su ID")
         void obtenerPorId() {
-            when(productoService.obtenerPorId(1L)).thenReturn(productoResponse);
+            when(productoService.obtenerPorId("1")).thenReturn(productoResponse);
 
-            ResponseEntity<ProductoResponseDTO> response = productoController.obtenerPorId(1L);
+            ResponseEntity<ProductoResponseDTO> response = productoController.obtenerPorId("1");
 
             assertAll(
                     () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                     () -> assertEquals(productoResponse, response.getBody())
             );
 
-            verify(productoService).obtenerPorId(1L);
+            verify(productoService).obtenerPorId("1");
         }
     }
 
@@ -112,17 +114,17 @@ class ProductoControllerTest {
         @Test
         @DisplayName("Debe actualizar un producto correctamente")
         void actualizarProducto() {
-            when(productoService.actualizarProducto(1L, productoRequest)).thenReturn(productoResponse);
+            when(productoService.actualizarProducto("1", productoRequest)).thenReturn(productoResponse);
 
             ResponseEntity<ProductoResponseDTO> response =
-                    productoController.actualizarProducto(1L, productoRequest);
+                    productoController.actualizarProducto("1", productoRequest);
 
             assertAll(
                     () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                     () -> assertEquals(productoResponse, response.getBody())
             );
 
-            verify(productoService).actualizarProducto(1L, productoRequest);
+            verify(productoService).actualizarProducto("1", productoRequest);
         }
     }
 
@@ -132,12 +134,12 @@ class ProductoControllerTest {
         @Test
         @DisplayName("Debe eliminar un producto correctamente")
         void eliminarProducto() {
-            doNothing().when(productoService).eliminarProducto(1L);
+            doNothing().when(productoService).eliminarProducto("1");
 
-            ResponseEntity<Void> response = productoController.eliminarProducto(1L);
+            ResponseEntity<Void> response = productoController.eliminarProducto("1");
 
             assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-            verify(productoService).eliminarProducto(1L);
+            verify(productoService).eliminarProducto("1");
         }
     }
 
@@ -199,6 +201,27 @@ class ProductoControllerTest {
             );
 
             verify(productoService).buscarPorEstado(EstadoProducto.DISPONIBLE);
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/productos/buscar/talla")
+    class BuscarPorTalla {
+        @Test
+        @DisplayName("Debe buscar productos por talla")
+        void buscarPorTalla() {
+            when(productoService.buscarPorTalla("S"))
+                    .thenReturn(List.of(productoResponse));
+
+            ResponseEntity<List<ProductoResponseDTO>> response =
+                    productoController.buscarPorTalla("S");
+
+            assertAll(
+                    () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                    () -> assertEquals(1, response.getBody().size())
+            );
+
+            verify(productoService).buscarPorTalla("S");
         }
     }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import srangeldev.camisapi.rest.productos.models.EstadoProducto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ProductoResponseDTO {
 
-    private Long id;
+    private String id;
     private String nombre;
     private String equipo;
     private String talla;
@@ -22,5 +23,5 @@ public class ProductoResponseDTO {
     private Double precio;
     private String imageUrl;
     private EstadoProducto estado;
-    private LocalDateTime fechaCreacion;
+    private LocalDate fechaCreacion;
 }

@@ -4,9 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import srangeldev.camisapi.rest.productos.dto.ProductoRequestDTO;
 import srangeldev.camisapi.rest.productos.dto.ProductoResponseDTO;
 import srangeldev.camisapi.rest.productos.mapper.ProductoMapper;
@@ -16,12 +17,13 @@ import srangeldev.camisapi.rest.productos.repository.ProductoRepository;
 import srangeldev.camisapi.rest.productos.exceptions.ProductoNotFound;
 import srangeldev.camisapi.rest.productos.service.ProductoService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Tests de ProductoService")
 class ProductoServiceTest {
 
@@ -40,38 +42,44 @@ class ProductoServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         producto = Producto.builder()
-                .id(1L)
+                .id("1")
                 .nombre("Camiseta Real Madrid")
                 .equipo("Real Madrid")
                 .talla("M")
                 .descripcion("Camiseta oficial")
                 .precio(50.0)
+                .imageUrl("url")
+                .estado(EstadoProducto.DISPONIBLE)
+                .fechaCreacion(LocalDate.now())
+                .build();
+
+        requestDTO = ProductoRequestDTO.builder()
+                .nombre("Camiseta Real Madrid")
+                .equipo("Real Madrid")
+                .talla("M")
+                .descripcion("Camiseta oficial")
+                .precio(50.0)
+                .imageUrl("url")
                 .estado(EstadoProducto.DISPONIBLE)
                 .build();
 
-        requestDTO = new ProductoRequestDTO();
-        requestDTO.setNombre("Camiseta Real Madrid");
-        requestDTO.setEquipo("Real Madrid");
-        requestDTO.setTalla("M");
-        requestDTO.setDescripcion("Camiseta oficial");
-        requestDTO.setPrecio(50.0);
-        requestDTO.setEstado(EstadoProducto.DISPONIBLE);
-        requestDTO.setImageUrl("url");
-
-        responseDTO = new ProductoResponseDTO();
-        responseDTO.setId(1L);
-        responseDTO.setNombre("Camiseta Real Madrid");
-        responseDTO.setEquipo("Real Madrid");
-        responseDTO.setTalla("M");
-        responseDTO.setDescripcion("Camiseta oficial");
-        responseDTO.setPrecio(50.0);
-        responseDTO.setEstado(EstadoProducto.DISPONIBLE);
-        responseDTO.setImageUrl("url");
+        responseDTO = ProductoResponseDTO.builder()
+                .id("1")
+                .nombre("Camiseta Real Madrid")
+                .equipo("Real Madrid")
+                .talla("M")
+                .descripcion("Camiseta oficial")
+                .precio(50.0)
+                .imageUrl("url")
+                .estado(EstadoProducto.DISPONIBLE)
+                .fechaCreacion(LocalDate.now())
+                .build();
     }
 
+    // ------------------------------------------------------
+    // CREAR PRODUCTO
+    // ------------------------------------------------------
     @Nested
     @DisplayName("crearProducto")
     class CrearProducto {
@@ -85,11 +93,16 @@ class ProductoServiceTest {
 
             ProductoResponseDTO resultado = productoService.crearProducto(requestDTO);
 
-            assertEquals(responseDTO.getNombre(), resultado.getNombre());
-            verify(productoRepository, times(1)).save(producto);
+            assertAll(
+                    () -> assertEquals(responseDTO.getNombre(), resultado.getNombre()),
+                    () -> verify(productoRepository, times(1)).save(producto)
+            );
         }
     }
 
+    // ------------------------------------------------------
+    // LISTAR PRODUCTOS
+    // ------------------------------------------------------
     @Nested
     @DisplayName("listarProductos")
     class ListarProductos {
@@ -102,11 +115,16 @@ class ProductoServiceTest {
 
             List<ProductoResponseDTO> resultados = productoService.listarProductos();
 
-            assertEquals(1, resultados.size());
-            assertEquals("Camiseta Real Madrid", resultados.get(0).getNombre());
+            assertAll(
+                    () -> assertEquals(1, resultados.size()),
+                    () -> assertEquals("Camiseta Real Madrid", resultados.get(0).getNombre())
+            );
         }
     }
 
+    // ------------------------------------------------------
+    // OBTENER POR ID
+    // ------------------------------------------------------
     @Nested
     @DisplayName("obtenerPorId")
     class ObtenerPorId {
@@ -114,10 +132,10 @@ class ProductoServiceTest {
         @Test
         @DisplayName("Debería devolver producto si existe")
         void obtenerPorId_ok() {
-            when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+            when(productoRepository.findById("1")).thenReturn(Optional.of(producto));
             when(productoMapper.toDTO(producto)).thenReturn(responseDTO);
 
-            ProductoResponseDTO resultado = productoService.obtenerPorId(1L);
+            ProductoResponseDTO resultado = productoService.obtenerPorId("1");
 
             assertEquals("Camiseta Real Madrid", resultado.getNombre());
         }
@@ -125,12 +143,15 @@ class ProductoServiceTest {
         @Test
         @DisplayName("Debería lanzar excepción si no existe")
         void obtenerPorId_notFound() {
-            when(productoRepository.findById(2L)).thenReturn(Optional.empty());
+            when(productoRepository.findById("2")).thenReturn(Optional.empty());
 
-            assertThrows(ProductoNotFound.class, () -> productoService.obtenerPorId(2L));
+            assertThrows(ProductoNotFound.class, () -> productoService.obtenerPorId("2"));
         }
     }
 
+    // ------------------------------------------------------
+    // ACTUALIZAR PRODUCTO
+    // ------------------------------------------------------
     @Nested
     @DisplayName("actualizarProducto")
     class ActualizarProducto {
@@ -138,11 +159,11 @@ class ProductoServiceTest {
         @Test
         @DisplayName("Debería actualizar un producto existente")
         void actualizarProducto_ok() {
-            when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+            when(productoRepository.findById("1")).thenReturn(Optional.of(producto));
             when(productoRepository.save(producto)).thenReturn(producto);
             when(productoMapper.toDTO(producto)).thenReturn(responseDTO);
 
-            ProductoResponseDTO resultado = productoService.actualizarProducto(1L, requestDTO);
+            ProductoResponseDTO resultado = productoService.actualizarProducto("1", requestDTO);
 
             assertEquals("Camiseta Real Madrid", resultado.getNombre());
             verify(productoRepository, times(1)).save(producto);
@@ -151,12 +172,15 @@ class ProductoServiceTest {
         @Test
         @DisplayName("Debería lanzar excepción si el producto no existe")
         void actualizarProducto_notFound() {
-            when(productoRepository.findById(2L)).thenReturn(Optional.empty());
+            when(productoRepository.findById("2")).thenReturn(Optional.empty());
 
-            assertThrows(ProductoNotFound.class, () -> productoService.actualizarProducto(2L, requestDTO));
+            assertThrows(ProductoNotFound.class, () -> productoService.actualizarProducto("2", requestDTO));
         }
     }
 
+    // ------------------------------------------------------
+    // ELIMINAR PRODUCTO
+    // ------------------------------------------------------
     @Nested
     @DisplayName("eliminarProducto")
     class EliminarProducto {
@@ -164,22 +188,25 @@ class ProductoServiceTest {
         @Test
         @DisplayName("Debería eliminar producto si existe")
         void eliminarProducto_ok() {
-            when(productoRepository.existsById(1L)).thenReturn(true);
+            when(productoRepository.existsById("1")).thenReturn(true);
 
-            productoService.eliminarProducto(1L);
+            productoService.eliminarProducto("1");
 
-            verify(productoRepository, times(1)).deleteById(1L);
+            verify(productoRepository, times(1)).deleteById("1");
         }
 
         @Test
         @DisplayName("Debería lanzar excepción si no existe")
         void eliminarProducto_notFound() {
-            when(productoRepository.existsById(2L)).thenReturn(false);
+            when(productoRepository.existsById("2")).thenReturn(false);
 
-            assertThrows(ProductoNotFound.class, () -> productoService.eliminarProducto(2L));
+            assertThrows(ProductoNotFound.class, () -> productoService.eliminarProducto("2"));
         }
     }
 
+    // ------------------------------------------------------
+    // BUSCAR POR NOMBRE
+    // ------------------------------------------------------
     @Nested
     @DisplayName("buscarPorNombre")
     class BuscarPorNombre {
@@ -187,15 +214,20 @@ class ProductoServiceTest {
         @Test
         @DisplayName("Debería devolver productos por nombre")
         void buscarPorNombre_ok() {
-            when(productoRepository.findByNombreIgnoreCase("Camiseta Barça")).thenReturn(List.of(producto));
+            when(productoRepository.findByNombreIgnoreCase("Camiseta Real Madrid"))
+                    .thenReturn(List.of(producto));
+
             when(productoMapper.toDTO(producto)).thenReturn(responseDTO);
 
-            List<ProductoResponseDTO> resultados = productoService.buscarPorNombre("Camiseta Barça");
+            List<ProductoResponseDTO> resultados = productoService.buscarPorNombre("Camiseta Real Madrid");
 
             assertEquals(1, resultados.size());
         }
     }
 
+    // ------------------------------------------------------
+    // BUSCAR POR EQUIPO
+    // ------------------------------------------------------
     @Nested
     @DisplayName("buscarPorEquipo")
     class BuscarPorEquipo {
@@ -203,15 +235,20 @@ class ProductoServiceTest {
         @Test
         @DisplayName("Debería devolver productos por equipo")
         void buscarPorEquipo_ok() {
-            when(productoRepository.findByEquipoIgnoreCase("Barcelona")).thenReturn(List.of(producto));
+            when(productoRepository.findByEquipoIgnoreCase("Real Madrid"))
+                    .thenReturn(List.of(producto));
+
             when(productoMapper.toDTO(producto)).thenReturn(responseDTO);
 
-            List<ProductoResponseDTO> resultados = productoService.buscarPorEquipo("Barcelona");
+            List<ProductoResponseDTO> resultados = productoService.buscarPorEquipo("Real Madrid");
 
             assertEquals(1, resultados.size());
         }
     }
 
+    // ------------------------------------------------------
+    // BUSCAR POR ESTADO
+    // ------------------------------------------------------
     @Nested
     @DisplayName("buscarPorEstado")
     class BuscarPorEstado {
@@ -219,7 +256,9 @@ class ProductoServiceTest {
         @Test
         @DisplayName("Debería devolver productos por estado")
         void buscarPorEstado_ok() {
-            when(productoRepository.findByEstado(EstadoProducto.DISPONIBLE)).thenReturn(List.of(producto));
+            when(productoRepository.findByEstado(EstadoProducto.DISPONIBLE))
+                    .thenReturn(List.of(producto));
+
             when(productoMapper.toDTO(producto)).thenReturn(responseDTO);
 
             List<ProductoResponseDTO> resultados = productoService.buscarPorEstado(EstadoProducto.DISPONIBLE);
@@ -227,5 +266,20 @@ class ProductoServiceTest {
             assertEquals(1, resultados.size());
         }
     }
-}
 
+    @Nested
+    @DisplayName("buscarPorTalla")
+    class BuscarPorTalla {
+
+        @Test
+        @DisplayName("Debería devolver productos por talla")
+        void buscarProductosPorTalla_ok() {
+            when(productoRepository.findByTalla("M")).thenReturn(List.of(producto));
+            when(productoMapper.toDTO(producto)).thenReturn(responseDTO);
+
+            List<ProductoResponseDTO> resultados = productoService.buscarPorTalla("M");
+
+            assertEquals(1, resultados.size());
+        }
+    }
+}

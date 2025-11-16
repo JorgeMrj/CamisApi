@@ -3,6 +3,7 @@ package srangeldev.camisapi.rest.productos.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.socket.WebSocketHandler;
 import srangeldev.camisapi.rest.productos.dto.ProductoRequestDTO;
 import srangeldev.camisapi.rest.productos.dto.ProductoResponseDTO;
 import srangeldev.camisapi.rest.productos.exceptions.ProductoNotFound;
@@ -11,7 +12,7 @@ import srangeldev.camisapi.rest.productos.models.EstadoProducto;
 import srangeldev.camisapi.rest.productos.models.Producto;
 import srangeldev.camisapi.rest.productos.repository.ProductoRepository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -21,6 +22,7 @@ public class ProductoService {
 
     private final ProductoRepository productoRepository;
     private final ProductoMapper productoMapper;
+    private final WebSocketHandler productosWebSocketHandler;
 
     /**
      * Crea un nuevo producto en la base de datos.
@@ -30,10 +32,11 @@ public class ProductoService {
         Producto producto = productoMapper.toEntity(dto);
 
         if (producto.getFechaCreacion() == null) {
-            producto.setFechaCreacion(LocalDateTime.now());
+            producto.setFechaCreacion(LocalDate.now());
         }
 
         Producto guardado = productoRepository.save(producto);
+        productosWebSocketHandler.broadcastObject(productoMapper.toDTO(guardado));
         return productoMapper.toDTO(guardado);
     }
 
@@ -50,7 +53,7 @@ public class ProductoService {
     /**
      * Busca un producto por su ID.
      */
-    public ProductoResponseDTO obtenerPorId(Long id) {
+    public ProductoResponseDTO obtenerPorId(String id) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new ProductoNotFound("No se encontró el producto con ID: " + id));
 
@@ -60,7 +63,7 @@ public class ProductoService {
     /**
      * Actualiza un producto existente.
      */
-    public ProductoResponseDTO actualizarProducto(Long id, ProductoRequestDTO dto) {
+    public ProductoResponseDTO actualizarProducto(String id, ProductoRequestDTO dto) {
         Producto existente = productoRepository.findById(id)
                 .orElseThrow(() -> new ProductoNotFound("No se puede actualizar. No existe el producto con ID: " + id));
 
@@ -79,7 +82,7 @@ public class ProductoService {
     /**
      * Elimina un producto por su ID.
      */
-    public void eliminarProducto(Long id) {
+    public void eliminarProducto(String id) {
         if (!productoRepository.existsById(id)) {
             throw new ProductoNotFound("No se puede eliminar. No existe el producto con ID: " + id);
         }
@@ -87,7 +90,7 @@ public class ProductoService {
     }
 
     /**
-     * Busca productos por nombre (contiene texto, sin distinguir mayúsculas/minúsculas).
+     * Busca productos por nombre
      */
     public List<ProductoResponseDTO> buscarPorNombre(String nombre) {
         return productoRepository.findByNombreIgnoreCase(nombre)
@@ -116,6 +119,9 @@ public class ProductoService {
                 .toList();
     }
 
+    /**
+     * Busca productos por talla (S, X, M, L, XL, XXL)
+     */
     public List<ProductoResponseDTO> buscarPorTalla(String talla) {
         return productoRepository.findByTalla(talla)
                 .stream()

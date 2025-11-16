@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja errores generales (runtime)
+     * Maneja errores generales
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {

@@ -24,7 +24,8 @@ public class ProductoController {
      */
     @PostMapping
     public ResponseEntity<ProductoResponseDTO> crearProducto(
-            @Valid @RequestBody ProductoRequestDTO productoRequestDTO) {
+            @Valid
+            @RequestBody ProductoRequestDTO productoRequestDTO) {
 
         ProductoResponseDTO nuevoProducto = productoService.crearProducto(productoRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
@@ -44,7 +45,7 @@ public class ProductoController {
      * Obtener un producto por ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable String id) {
         ProductoResponseDTO producto = productoService.obtenerPorId(id);
         return ResponseEntity.ok(producto);
     }
@@ -54,7 +55,7 @@ public class ProductoController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponseDTO> actualizarProducto(
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody ProductoRequestDTO productoRequestDTO) {
 
         ProductoResponseDTO actualizado = productoService.actualizarProducto(id, productoRequestDTO);
@@ -65,13 +66,13 @@ public class ProductoController {
      * Eliminar un producto por ID
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarProducto(@PathVariable String id) {
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }
 
     /**
-     * Buscar productos por nombre (parcial)
+     * Buscar productos por nombre
      */
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<ProductoResponseDTO>> buscarPorNombre(@RequestParam String nombre) {
@@ -97,6 +98,9 @@ public class ProductoController {
         return ResponseEntity.ok(resultados);
     }
 
+    /**
+     * Buscar productos por talla
+     */
     @GetMapping("/buscar/talla")
     public ResponseEntity<List<ProductoResponseDTO>> buscarPorTalla(@RequestParam String talla) {
         List<ProductoResponseDTO> resultados = productoService.buscarPorTalla(talla);
