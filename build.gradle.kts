@@ -1,3 +1,4 @@
+
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
@@ -5,7 +6,6 @@ plugins {
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco") // Plugin de Jacoco para test de cobertura
-    id("org.jetbrains.dokka") version "2.1.0"
 }
 
 group = "srangeldev"
@@ -44,7 +44,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
     // Thymeleaf extras
-    //implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 
     // Database Drivers
     runtimeOnly("org.postgresql:postgresql")
@@ -94,23 +94,8 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter")
 }
 
-// Javadoc configuration - ignore errors for Java 25
-tasks.withType<Javadoc> {
-    options {
-        (this as StandardJavadocDocletOptions).apply {
-            addStringOption("Xdoclint:none", "-quiet")
-            addStringOption("encoding", "UTF-8")
-            addStringOption("charSet", "UTF-8")
-        }
-    }
-    isFailOnError = false
-}
-
 tasks.withType<Test> {
     useJUnitPlatform()
-    
-    // Usar perfil 'test' para los tests
-    systemProperty("spring.profiles.active", "test")
 
     testLogging {
         events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
@@ -155,7 +140,7 @@ val integrationTest = tasks.register<Test>("integrationTest") {
 
 // Jacoco configuration
 jacoco {
-    toolVersion = "0.8.14"
+    toolVersion = "0.8.11"
 }
 
 tasks.jacocoTestReport {
@@ -217,23 +202,3 @@ tasks.jacocoTestCoverageVerification {
 tasks.check {
     dependsOn(tasks.jacocoTestCoverageVerification)
 }
-
-// Configuración de Dokka V2
-dokka {
-    // Configuración del plugin HTML con estilos personalizados
-    pluginsConfiguration.html {
-        // NUEVO archivo CSS para evitar caché
-        customStyleSheets.from("src/main/resources/assets/dokka-styles-new.css")
-        
-        // Assets personalizados (logo y otros recursos)
-        customAssets.from("src/main/resources/assets/my-logo.png")
-    }
-    
-    // Directorio de salida personalizado
-    dokkaPublications.html {
-        outputDirectory.set(layout.buildDirectory.dir("docs/dokka"))
-    }
-}
-
-// Para generar la documentación, ejecuta: ./gradlew :dokkaGenerate
-// o para solo HTML: ./gradlew :dokkaGeneratePublicationHtml

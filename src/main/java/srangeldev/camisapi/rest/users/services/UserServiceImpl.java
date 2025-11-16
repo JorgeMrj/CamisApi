@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import srangeldev.camisapi.rest.users.dto.UserCreateRequestDto;
 import srangeldev.camisapi.rest.users.dto.UserResponseDto;
 import srangeldev.camisapi.rest.users.dto.UserUpdateRequestDto;
-import srangeldev.camisapi.rest.users.exceptions.UserBadRequest;
 import srangeldev.camisapi.rest.users.exceptions.UserNotFound;
 import srangeldev.camisapi.rest.users.mappers.UserMapper;
 import srangeldev.camisapi.rest.users.models.User;
 import srangeldev.camisapi.rest.users.repositories.UserRepository;
+import srangeldev.camisapi.rest.usuarios.exceptions.UserBadRequest;
 
 import java.util.ArrayList;
 import java.util.List;

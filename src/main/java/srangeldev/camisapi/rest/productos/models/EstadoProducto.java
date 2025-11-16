@@ -12,18 +12,5 @@ package srangeldev.camisapi.rest.productos.models;
  * 3. VENDIDO → El producto ha sido vendido y ya no está disponible
  */
 public enum EstadoProducto {
-    /**
-     * Producto disponible para la venta
-     */
-    DISPONIBLE,
-    
-    /**
-     * Producto reservado temporalmente en un carrito
-     */
-    RESERVADO,
-    
-    /**
-     * Producto vendido, ya no disponible
-     */
-    VENDIDO
+    DISPONIBLE, RESERVADO, VENDIDO
 }
