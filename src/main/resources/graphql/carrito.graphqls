@@ -1,11 +1,6 @@
-# Schema GraphQL para el módulo de Carrito
-# Fecha: 2025-11-16
+# Schema GraphQL para Carrito (versión simple para DAW)
 
-# ===============================
-# TIPOS DE DATOS
-# ===============================
-
-# Tipo principal Carrito
+# Tipo Carrito
 type Carrito {
     id: ID!
     userId: ID!
@@ -13,80 +8,45 @@ type Carrito {
     totalItems: Int!
     modificadoEn: String!
     creadoEn: String!
+    isValid: Boolean!
 }
 
-# ===============================
-# INPUTS PARA MUTACIONES
-# ===============================
-
-# Input para crear un nuevo carrito
+# Inputs para crear carrito
 input CarritoCreateInput {
     userId: ID!
     items: [String!] = []
 }
 
-# Input para actualizar un carrito existente
+# Input para actualizar carrito
 input CarritoUpdateInput {
     items: [String!]
 }
 
-# Input para agregar un item al carrito
+# Input para agregar item
 input CarritoAddItemInput {
     carritoId: ID!
     itemId: String!
 }
 
-# Input para remover un item del carrito
+# Input para remover item
 input CarritoRemoveItemInput {
     carritoId: ID!
     itemId: String!
 }
 
-# ===============================
-# CONSULTAS (QUERIES)
-# ===============================
-
+# CONSULTAS
 type Query {
-    # Obtener todos los carritos
     carritos: [Carrito!]!
-
-    # Obtener carrito por ID
     carrito(id: ID!): Carrito
-
-    # Obtener carrito por ID de usuario
     carritoByUserId(userId: ID!): Carrito
 }
 
-# ===============================
-# MUTACIONES (MUTATIONS)
-# ===============================
-
+# OPERACIONES
 type Mutation {
-    # Crear un nuevo carrito
     crearCarrito(input: CarritoCreateInput!): Carrito!
-
-    # Actualizar carrito existente
     actualizarCarrito(id: ID!, input: CarritoUpdateInput!): Carrito!
-
-    # Agregar item al carrito
     agregarItemCarrito(input: CarritoAddItemInput!): Carrito!
-
-    # Remover item del carrito
     removerItemCarrito(input: CarritoRemoveItemInput!): Carrito!
-
-    # Eliminar carrito
     eliminarCarrito(id: ID!): Carrito!
-
-    # Vaciar carrito (eliminar todos los items)
     vaciarCarrito(id: ID!): Carrito!
-}
-
-# ===============================
-# TIPOS DE ERROR
-# ===============================
-
-# Extensión para manejo de errores personalizado
-extend type Carrito {
-    # Validaciones adicionales si son necesarias
-    isValid: Boolean!
 }
