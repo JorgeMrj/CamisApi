@@ -2,23 +2,24 @@ package srangeldev.camisapi.rest.users.controllers;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import srangeldev.camisapi.rest.users.dto.UserCreateRequestDto;
 import srangeldev.camisapi.rest.users.dto.UserResponseDto;
 import srangeldev.camisapi.rest.users.dto.UserUpdateRequestDto;
+import srangeldev.camisapi.rest.users.exceptions.UserBadId;
 import srangeldev.camisapi.rest.users.services.UserService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
+/**
+ * Controlador REST para gestión de usuarios con MongoDB
+ * Siguiendo el patrón del profesor
+ */
 @RestController
 @RequestMapping("${api.version}/users")
 @Slf4j
@@ -32,52 +33,87 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * Obtiene todos los usuarios
+     */
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> getAllUsers(
-            @RequestParam(required = false) Optional<String> username,
-            @RequestParam(required = false) Optional<String> email,
-            @RequestParam(required = false) Optional<Boolean> isDeleted
-    ) {
-        log.info("Buscando todos los usuarios con los siguientes filtros: username={}, email={}, isDeleted={}",
-                username.orElse("N/A"), email.orElse("N/A"), isDeleted.map(String::valueOf).orElse("N/A"));
-        List<UserResponseDto> users = userService.findAll();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        log.info("Obteniendo todos los usuarios");
+        return ResponseEntity.ok(userService.findAll());
     }
 
+    /**
+     * Obtiene un usuario por su ID (ObjectId)
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable String id) {
         log.info("Buscando usuario por id: {}", id);
-        return ResponseEntity.ok(userService.findById(id));
+        
+        // Validar que el ID es un ObjectId válido
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(id);
+        } catch (IllegalArgumentException e) {
+            throw new UserBadId("El ID proporcionado no es válido: " + id);
+        }
+        
+        return ResponseEntity.ok(userService.findById(objectId));
     }
 
+    /**
+     * Busca usuarios por nombre
+     */
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<List<UserResponseDto>> getUsersByNombre(@PathVariable String nombre) {
+        log.info("Buscando usuarios por nombre: {}", nombre);
+        return ResponseEntity.ok(userService.findByNombre(nombre));
+    }
+
+    /**
+     * Crea un nuevo usuario
+     */
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserCreateRequestDto userCreateRequestDto) {
         log.info("Creando nuevo usuario: {}", userCreateRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(userCreateRequestDto));
     }
 
+    /**
+     * Actualiza un usuario existente
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable String id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+    public ResponseEntity<UserResponseDto> updateUser(
+            @PathVariable String id, 
+            @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
         log.info("Actualizando usuario con id: {} y datos: {}", id, userUpdateRequestDto);
-        return ResponseEntity.ok(userService.update(id, userUpdateRequestDto));
+        
+        // Validar que el ID es un ObjectId válido
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(id);
+        } catch (IllegalArgumentException e) {
+            throw new UserBadId("El ID proporcionado no es válido: " + id);
+        }
+        
+        return ResponseEntity.ok(userService.update(objectId, userUpdateRequestDto));
     }
 
+    /**
+     * Elimina un usuario (borrado físico)
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable String id) {
         log.info("Eliminando usuario con id: {}", id);
-        userService.deleteById(id);
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
+        
+        // Validar que el ID es un ObjectId válido
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(id);
+        } catch (IllegalArgumentException e) {
+            throw new UserBadId("El ID proporcionado no es válido: " + id);
+        }
+        
+        userService.deleteById(objectId);
     }
 }

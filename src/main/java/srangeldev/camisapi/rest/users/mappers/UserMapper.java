@@ -26,11 +26,11 @@ public class UserMapper {
 
     /**
      * Convierte una entidad User a un DTO de respuesta.
-     * IMPORTANTE: Omite la contraseña.
+     * IMPORTANTE: Omite la contraseña y convierte ObjectId a String.
      */
     public UserResponseDto toUsuarioResponseDto(User user) {
         return UserResponseDto.builder()
-                .id(user.getId())
+                .id(user.getId() != null ? user.getId().toHexString() : null)
                 .nombre(user.getNombre())
                 .username(user.getUsername())
                 .roles(user.getRoles())

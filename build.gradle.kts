@@ -234,6 +234,3 @@ dokka {
         outputDirectory.set(layout.buildDirectory.dir("docs/dokka"))
     }
 }
-
-// Para generar la documentación, ejecuta: ./gradlew :dokkaGenerate
-// o para solo HTML: ./gradlew :dokkaGeneratePublicationHtml

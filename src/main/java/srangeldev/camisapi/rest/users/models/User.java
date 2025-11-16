@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,18 +25,22 @@ import java.util.stream.Collectors;
  * 
  * Almacena la información de usuarios del sistema.
  * Es el único modelo que se guarda en MongoDB según la arquitectura híbrida.
+ * 
+ * Utiliza @Document para indicar que es un documento de MongoDB
+ * y @TypeAlias para indicar con qué clase se van a mapear a la hora de recuperarlos de la base de datos.
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "users")
+@Document("users")
+@TypeAlias("User")
 public class User implements UserDetails {
     /**
-     * Identificador único del usuario en MongoDB
+     * Identificador único del usuario en MongoDB usando ObjectId
      */
     @Id
-    private String id;
+    private ObjectId id;
 
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 50, message = "El nombre no puede tener más de 50 caracteres")
