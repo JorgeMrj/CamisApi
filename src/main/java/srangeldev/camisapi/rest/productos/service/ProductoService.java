@@ -1,6 +1,10 @@
 package srangeldev.camisapi.rest.productos.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.socket.WebSocketHandler;
@@ -18,6 +22,7 @@ import java.util.List;
 @Service
 @Validated
 @RequiredArgsConstructor
+@CacheConfig (cacheNames = {"productos"})
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
@@ -25,9 +30,32 @@ public class ProductoService {
     private final WebSocketHandler productosWebSocketHandler;
 
     /**
-     * Crea un nuevo producto en la base de datos.
+     * Devuelve todos los productos del catálogo.
+     */
+    @Cacheable("productos")
+    public List<ProductoResponseDTO> listarProductos() {
+        return productoRepository.findAll()
+                .stream()
+                .map(productoMapper::toDTO)
+                .toList();
+    }
+
+    /**
+     * Busca un producto por su ID.
+     */
+    @Cacheable(key = "#id")
+    public ProductoResponseDTO obtenerPorId(String id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new ProductoNotFound("No se encontró el producto con ID: " + id));
+
+        return productoMapper.toDTO(producto);
+    }
+
+    /**
+     * Crea un nuevo producto.
      * Si no se especifica fechaCreacion, se asigna la fecha actual.
      */
+    @CacheEvict(key = "#result.id")
     public ProductoResponseDTO crearProducto(ProductoRequestDTO dto) {
         Producto producto = productoMapper.toEntity(dto);
 
@@ -40,28 +68,9 @@ public class ProductoService {
     }
 
     /**
-     * Devuelve todos los productos del catálogo.
-     */
-    public List<ProductoResponseDTO> listarProductos() {
-        return productoRepository.findAll()
-                .stream()
-                .map(productoMapper::toDTO)
-                .toList();
-    }
-
-    /**
-     * Busca un producto por su ID.
-     */
-    public ProductoResponseDTO obtenerPorId(String id) {
-        Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new ProductoNotFound("No se encontró el producto con ID: " + id));
-
-        return productoMapper.toDTO(producto);
-    }
-
-    /**
      * Actualiza un producto existente.
      */
+    @CacheEvict(key = "#id")
     public ProductoResponseDTO actualizarProducto(String id, ProductoRequestDTO dto) {
         Producto existente = productoRepository.findById(id)
                 .orElseThrow(() -> new ProductoNotFound("No se puede actualizar. No existe el producto con ID: " + id));
@@ -81,6 +90,7 @@ public class ProductoService {
     /**
      * Elimina un producto por su ID.
      */
+    @CacheEvict(key = "#id")
     public void eliminarProducto(String id) {
         if (!productoRepository.existsById(id)) {
             throw new ProductoNotFound("No se puede eliminar. No existe el producto con ID: " + id);
@@ -91,6 +101,7 @@ public class ProductoService {
     /**
      * Busca productos por nombre
      */
+    @Cacheable(key = "#nombre")
     public List<ProductoResponseDTO> buscarPorNombre(String nombre) {
         return productoRepository.findByNombreIgnoreCase(nombre)
                 .stream()
@@ -101,6 +112,7 @@ public class ProductoService {
     /**
      * Busca productos por equipo.
      */
+    @Cacheable(key = "#equipo")
     public List<ProductoResponseDTO> buscarPorEquipo(String equipo) {
         return productoRepository.findByEquipoIgnoreCase(equipo)
                 .stream()
@@ -111,6 +123,7 @@ public class ProductoService {
     /**
      * Busca productos por estado (DISPONIBLE, RESERVADO, VENDIDO).
      */
+    @Cacheable(key = "#estado")
     public List<ProductoResponseDTO> buscarPorEstado(EstadoProducto estado) {
         return productoRepository.findByEstado(estado)
                 .stream()
@@ -121,6 +134,7 @@ public class ProductoService {
     /**
      * Busca productos por talla (S, X, M, L, XL, XXL)
      */
+    @Cacheable(key = "#talla")
     public List<ProductoResponseDTO> buscarPorTalla(String talla) {
         return productoRepository.findByTalla(talla)
                 .stream()
