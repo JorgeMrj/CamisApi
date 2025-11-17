@@ -60,8 +60,8 @@ import static org.mockito.Mockito.*;
 
         pedido = Pedido.builder()
                 .id(1L)
-                .userId(20L)
-                .estado(EstadoPedido.ENVIADO)
+                .userId("2")
+                .estado(EstadoPedido.PENDIENTE_PAGO)
                 .createdAt(LocalDateTime.now())
                 .total(100.0)
                 .detalles(List.of(detalle))
@@ -78,8 +78,8 @@ import static org.mockito.Mockito.*;
                 .build();
         pedidoResponseDto = PedidoResponseDto.builder()
                 .id(1L)
-                .userId(20L)
-                .estado(EstadoPedido.ENVIADO)
+                .userId("2")
+                .estado(EstadoPedido.PAGADO)
                 .createdAt(LocalDateTime.now())
                 .total(100.0)
                 .fechaPago((LocalDateTime.now()))
@@ -87,7 +87,7 @@ import static org.mockito.Mockito.*;
                 .detalles(List.of(detallePedidoDto))
                 .build();
         pedidoRequestDto = PedidoRequestDto.builder()
-                .userId(20L)
+                .userId("2")
                 .total(100.0)
                 .detalles(List.of(detallePedidoDto))
                 .build();
@@ -123,13 +123,13 @@ import static org.mockito.Mockito.*;
         @DisplayName("Deberia devolver todos los pedidos")
         void listarPedidos_ok(){
             when(pedidoRepository.findAll()).thenReturn(List.of(pedido));
-            when(pedidoMappers.toResponseDto(pedido)).thenReturn(pedidoResponseDto);
+            when(pedidoMappers.toResponseList(List.of(pedido))).thenReturn(List.of(pedidoResponseDto));
 
             List<PedidoResponseDto> resultados = pedidoService.listarPedidos();
 
             assertAll(
                     () -> assertEquals(1, resultados.size()),
-                    () -> assertEquals(EstadoPedido.ENVIADO, resultados.get(0).getEstado())
+                    () -> assertEquals(EstadoPedido.PAGADO, resultados.get(0).getEstado())
             );
         }
 
@@ -141,10 +141,11 @@ import static org.mockito.Mockito.*;
         @Test
         @DisplayName("Deveria devolver todos los pedidos por usuario")
         void findByUsuario_ok(){
-            when(pedidoRepository.findByUserId(20L)).thenReturn(List.of(pedido));
-            when(pedidoMappers.toResponseDto(pedido)).thenReturn(pedidoResponseDto);
+            when(pedidoRepository.findByUserId("2")).thenReturn(List.of(pedido));
+            when(pedidoMappers.toResponseList(List.of(pedido))).thenReturn(List.of(pedidoResponseDto));
 
-            List<PedidoResponseDto> resultados = pedidoService.findByUsuario(20L);
+
+            List<PedidoResponseDto> resultados = pedidoService.findByUsuario("2");
             assertEquals(1, resultados.size());
         }
     }
@@ -162,7 +163,7 @@ import static org.mockito.Mockito.*;
             PedidoResponseDto resultado = pedidoService.obtenerPorId(1L);
 
             assertAll(
-                    () -> assertEquals(EstadoPedido.ENVIADO, resultado.getEstado())
+                    () -> assertEquals(EstadoPedido.PENDIENTE_PAGO, resultado.getEstado())
             );
         }
 
@@ -193,11 +194,11 @@ import static org.mockito.Mockito.*;
             );
         }
         @Test
-        @DisplayName("Deveria actualizar el estado de los pedidos")
+        @DisplayName("Deveria lanzar un exception")
         void actualizarEstado_notFound(){
-            when(pedidoRepository.findById(1L)).thenReturn(Optional.empty());
+            when(pedidoRepository.findById(0L)).thenReturn(Optional.empty());
 
-            assertThrows(PedidoConflictException.class, () -> pedidoService.actualizarEstado(0L, EstadoPedido.PAGADO));
+            assertThrows(PedidoNotFoundException.class, () -> pedidoService.actualizarEstado(0L, EstadoPedido.PAGADO));
         }
     }
 
@@ -208,10 +209,10 @@ import static org.mockito.Mockito.*;
         @Test
         @DisplayName("Devuelve pedidos por estado")
         void buscarPorEstado_ok(){
-            when(pedidoRepository.findByEstado(EstadoPedido.ENVIADO)).thenReturn(List.of(pedido));
-            when(pedidoMappers.toResponseDto(pedido)).thenReturn(pedidoResponseDto);
+            when(pedidoRepository.findByEstado(EstadoPedido.PAGADO)).thenReturn(List.of(pedido));
+            when(pedidoMappers.toResponseList(List.of(pedido))).thenReturn(List.of(pedidoResponseDto));
 
-            List<PedidoResponseDto> resultados = pedidoService.buscarPorEstado(EstadoPedido.ENVIADO);
+            List<PedidoResponseDto> resultados = pedidoService.buscarPorEstado(EstadoPedido.PAGADO);
 
             assertEquals(1, resultados.size());
         }
@@ -224,14 +225,14 @@ import static org.mockito.Mockito.*;
         @Test
         @DisplayName("Elimina el pedido")
         void eliminarPedido_ok(){
-            when(pedidoRepository.existsById(1L)).thenReturn(true);
+            when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
             pedidoService.eliminarPedido(1L);
-            verify(pedidoRepository, times(1)).deleteById(1L);
+            verify(pedidoRepository, times(1)).delete(pedido);
         }
         @Test
         @DisplayName("Si al intentar eliminar el pedido no existe")
         void eliminarPedido_notFound(){
-            when(pedidoRepository.existsById(3L)).thenReturn(false);
+            when(pedidoRepository.findById(3L)).thenReturn(Optional.empty());
 
             assertThrows(PedidoNotFoundException.class, () -> pedidoService.eliminarPedido(3L));
         }

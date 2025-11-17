@@ -38,6 +38,8 @@ public class PedidoControllerTest {
     private Pedido pedido;
     private DetallePedido detalle;
     private DetallePedidoDto detallePedidoDto;
+    private PedidoResponseDto pedidoResponseDto;
+    private PedidoRequestDto pedidoRequestDto;
 
     @BeforeEach
     void setUp() {
@@ -57,23 +59,23 @@ public class PedidoControllerTest {
                 .precioPagado(100.0)
                 .imageUrl("/camisetaDeFutbol.png")
                 .build();
-    }
-    private final PedidoResponseDto pedidoResponseDto = PedidoResponseDto.builder()
-            .id(1L)
-            .userId(20L)
-            .estado(EstadoPedido.ENVIADO)
-            .createdAt(LocalDateTime.now())
-            .total(100.0)
-            .fechaPago((LocalDateTime.now()))
-            .fechaEnvio(LocalDateTime.now())
-            .detalles(List.of(detallePedidoDto))
-            .build();
-    private final PedidoRequestDto pedidoRequestDto = PedidoRequestDto.builder()
-            .userId(20L)
-            .total(100.0)
-            .detalles(List.of(detallePedidoDto))
-            .build();
 
+        pedidoResponseDto = PedidoResponseDto.builder()
+                .id(1L)
+                .userId("1")
+                .estado(EstadoPedido.ENVIADO)
+                .createdAt(LocalDateTime.now())
+                .total(100.0)
+                .fechaPago((LocalDateTime.now()))
+                .fechaEnvio(LocalDateTime.now())
+                .detalles(List.of(detallePedidoDto))
+                .build();
+        pedidoRequestDto = PedidoRequestDto.builder()
+                .userId("1")
+                .total(100.0)
+                .detalles(List.of(detallePedidoDto))
+                .build();
+    }
     @Nested
     @DisplayName("POST /api/pedidos")
     class CrearPedidoTest {
@@ -136,10 +138,10 @@ public class PedidoControllerTest {
         @Test
         @DisplayName("Devolver los pedidos por usuario")
         void obtenerPedidosPorUsuario_ok(){
-            when(pedidoService.findByUsuario(1L)).thenReturn(List.of(pedidoResponseDto));
+            when(pedidoService.findByUsuario("1")).thenReturn(List.of(pedidoResponseDto));
 
             ResponseEntity<List<PedidoResponseDto>> response =
-                    pedidoController.obtenerPedidosPorUsuario(1L);
+                    pedidoController.obtenerPedidosPorUsuario("1");
 
             assertAll(
                     () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
@@ -147,7 +149,7 @@ public class PedidoControllerTest {
                     () -> assertEquals(pedidoResponseDto, response.getBody().get(0))
             );
 
-            verify(pedidoService, times(1)).findByUsuario(2L);
+            verify(pedidoService, times(1)).findByUsuario("1");
         }
 
     }
@@ -167,7 +169,7 @@ public class PedidoControllerTest {
                     () -> assertEquals(pedidoResponseDto, response.getBody())
             );
 
-            verify(pedidoService).actualizarEstado(2L, EstadoPedido.ENVIADO);
+            verify(pedidoService).actualizarEstado(1L, EstadoPedido.PAGADO);
         }
     }
     @Nested

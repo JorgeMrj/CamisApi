@@ -53,7 +53,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     // Obtiene los pedidos del usuario específico
     @Override
-    public List<PedidoResponseDto> findByUsuario(Long userId) {
+    public List<PedidoResponseDto> findByUsuario(String userId) {
         List<Pedido> pedidos = pedidoRepository.findByUserId(userId);
         return pedidoMapper.toResponseList(pedidos);
     }
@@ -68,6 +68,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     // Actualizamos el estado del pedido y registra fechas de pago y envío
     @Override
+    @Transactional
     public PedidoResponseDto actualizarEstado(Long pedidoId, EstadoPedido estado) {
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new PedidoNotFoundException("Pedido con ID " + pedidoId + " no encontrado"));
@@ -79,6 +80,12 @@ public class PedidoServiceImpl implements PedidoService {
             throw new PedidoConflictException("No puedes cambiar del estado " + pedido.getEstado() + " a " + estado);
         }
         pedido.setEstado(estado);
+        switch (estado) {
+            case PAGADO -> pedido.setFechaPago(LocalDateTime.now());
+            case ENVIADO -> pedido.setFechaEnvio(LocalDateTime.now());
+            default -> {
+            }
+        }
         Pedido actualizado = pedidoRepository.save(pedido);
         return pedidoMapper.toResponseDto(actualizado);
     }
@@ -88,6 +95,7 @@ public class PedidoServiceImpl implements PedidoService {
                     case PENDIENTE_PAGO -> nuevoEstado == EstadoPedido.PAGADO || nuevoEstado == EstadoPedido.CANCELADO;
                     case PAGADO -> nuevoEstado == EstadoPedido.ENVIADO || nuevoEstado == EstadoPedido.CANCELADO;
                     case ENVIADO -> nuevoEstado == EstadoPedido.ENTREGADO;
+
                     default -> false;
                 };
     }
@@ -98,9 +106,15 @@ public class PedidoServiceImpl implements PedidoService {
         return pedidoMapper.toResponseList(pedidoRepository.findByEstado(estado));
     }
 
-    //Eliminamos el pedido correspondiente al Id
+    //Eliminamos el pedido correspondiente
     @Override
     public void eliminarPedido(Long id) {
-        pedidoRepository.deleteById(id);
+        Pedido pedido = pedidoRepository.findById(id) //validamos se esta el pedido
+                .orElseThrow(() -> new PedidoNotFoundException("Pedido con ID " + id + " no encontrado"));
+
+        if (pedido.getEstado() != EstadoPedido.PENDIENTE_PAGO) { // Si El pedido esta Enviado, Pagado u otro que no este en proceso. NO SE PUEDE ELIMINAR
+            throw new PedidoConflictException("No se puede eliminar un pedido procesado");
+        }
+        pedidoRepository.delete(pedido);
     }
 }
