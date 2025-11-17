@@ -56,7 +56,7 @@ public class CarritoServiceImpl implements CarritoService{
         logger.info("id recibido: {}", carrito != null ? carrito.getUserId() : "NULL");
 
         try {
-            Optional<Carrito> existente = carritoRepository.findByUsuarioId(carrito.getUserId());
+            Optional<Carrito> existente = carritoRepository.findByUserId(carrito.getUserId());
             logger.info("Verificación de carrito existente: {}", existente.isPresent() ? "EXISTE" : "NO EXISTE");
 
             if (existente.isPresent()) {
@@ -99,7 +99,8 @@ public class CarritoServiceImpl implements CarritoService{
                 () -> new CarritoNotFound(id)
         );
 
-        actualizado.setId(carrito.getId());
+        // Usar el mapper para actualizar la entidad
+        carritoMapper.updateFromDto(actualizado, carrito);
         actualizado.setModificadoEn(LocalDateTime.now());
         return carritoMapper.toResponseDto(carritoRepository.save(actualizado));
     }
@@ -118,7 +119,7 @@ public class CarritoServiceImpl implements CarritoService{
     @Override
     public CarritoResponseDto findByUserId(Long userId) {
         logger.info("Buscando carrito por user id: " + userId);
-        Carrito carrito = carritoRepository.findByUsuarioId(userId).orElseThrow(
+        Carrito carrito = carritoRepository.findByUserId(userId).orElseThrow(
                 () -> new CarritoBadId("No se encontro carrito con nombre: " + userId)
         );
         return carritoMapper.toResponseDto(carrito);

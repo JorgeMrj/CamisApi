@@ -1,6 +1,5 @@
-# Schema GraphQL para Carrito (versión simple para DAW)
+# Schema GraphQL simple para Carrito (DAW)
 
-# Tipo Carrito
 type Carrito {
     id: ID!
     userId: ID!
@@ -11,42 +10,18 @@ type Carrito {
     isValid: Boolean!
 }
 
-# Inputs para crear carrito
 input CarritoCreateInput {
     userId: ID!
     items: [String!] = []
 }
 
-# Input para actualizar carrito
-input CarritoUpdateInput {
-    items: [String!]
-}
-
-# Input para agregar item
-input CarritoAddItemInput {
-    carritoId: ID!
-    itemId: String!
-}
-
-# Input para remover item
-input CarritoRemoveItemInput {
-    carritoId: ID!
-    itemId: String!
-}
-
-# CONSULTAS
 type Query {
     carritos: [Carrito!]!
     carrito(id: ID!): Carrito
     carritoByUserId(userId: ID!): Carrito
 }
 
-# OPERACIONES
 type Mutation {
     crearCarrito(input: CarritoCreateInput!): Carrito!
-    actualizarCarrito(id: ID!, input: CarritoUpdateInput!): Carrito!
-    agregarItemCarrito(input: CarritoAddItemInput!): Carrito!
-    removerItemCarrito(input: CarritoRemoveItemInput!): Carrito!
     eliminarCarrito(id: ID!): Carrito!
-    vaciarCarrito(id: ID!): Carrito!
 }
