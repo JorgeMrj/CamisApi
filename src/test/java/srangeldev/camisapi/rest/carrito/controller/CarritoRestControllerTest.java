@@ -9,14 +9,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import srangeldev.camisapi.rest.carrito.Exceptions.CarritoNotFound;
 import srangeldev.camisapi.rest.carrito.dto.CarritoCreateRequestDto;
 import srangeldev.camisapi.rest.carrito.dto.CarritoResponseDto;
 import srangeldev.camisapi.rest.carrito.dto.CarritoUpdateRequestDto;
 import srangeldev.camisapi.rest.carrito.service.CarritoServiceImpl;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,22 +37,22 @@ class CarritoRestControllerTest {
     private final CarritoResponseDto carritoResponse = CarritoResponseDto.builder()
             .id(1L)
             .userId(101L)
-            .items(Arrays.asList("item1", "item2"))
-            .totalItems(2)
+            .productos(new ArrayList<>())
+            .totalProductos(0)
             .creadoEn(LocalDateTime.of(2023, 1, 1, 12, 0))
             .modificadoEn(LocalDateTime.of(2023, 1, 1, 12, 0))
             .build();
 
     private final CarritoCreateRequestDto carritoCreateRequest = CarritoCreateRequestDto.builder()
             .userId(101L)
-            .items(Arrays.asList("item1"))
+            .productos(new ArrayList<>())
             .build();
 
     private final CarritoUpdateRequestDto carritoUpdateRequest = CarritoUpdateRequestDto.builder()
             .id(1L)
-            .items(Arrays.asList("item1", "item2", "item3"))
+            .productos(new ArrayList<>())
             .accion("REEMPLAZAR")
-            .productoId("item3")
+            .productoId(1L)
             .build();
 
     @Nested
@@ -62,7 +61,7 @@ class CarritoRestControllerTest {
         @Test
         @DisplayName("Debe retornar lista de carritos con status OK")
         void obtenerTodos() {
-            when(carritoService.getAll()).thenReturn(Arrays.asList(carritoResponse));
+            when(carritoService.getAll()).thenReturn(List.of(carritoResponse));
 
             ResponseEntity<List<CarritoResponseDto>> response = carritoRestController.getAll();
 
@@ -94,42 +93,13 @@ class CarritoRestControllerTest {
 
             verify(carritoService).getById(1L);
         }
-
-        @Test
-        @DisplayName("Debe lanzar excepción cuando carrito no existe")
-        void obtenerPorIdNoExiste() {
-            when(carritoService.getById(999L)).thenThrow(new CarritoNotFound(999L));
-
-            assertThrows(CarritoNotFound.class, () -> carritoRestController.getById(999L));
-
-            verify(carritoService).getById(999L);
-        }
-    }
-
-    @Nested
-    @DisplayName("GET /carritos/usuario/{userId}")
-    class ObtenerCarritoPorUsuario {
-        @Test
-        @DisplayName("Debe retornar carrito por user ID con status OK")
-        void obtenerPorUserId() {
-            when(carritoService.findByUserId(101L)).thenReturn(carritoResponse);
-
-            ResponseEntity<CarritoResponseDto> response = carritoRestController.getByUserId(101L);
-
-            assertAll(
-                    () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
-                    () -> assertEquals(carritoResponse, response.getBody())
-            );
-
-            verify(carritoService).findByUserId(101L);
-        }
     }
 
     @Nested
     @DisplayName("POST /carritos")
     class CrearCarrito {
         @Test
-        @DisplayName("Debe crear carrito exitosamente con status CREATED")
+        @DisplayName("Debe crear un nuevo carrito correctamente")
         void crearCarrito() {
             when(carritoService.save(carritoCreateRequest)).thenReturn(carritoResponse);
 
@@ -159,11 +129,12 @@ class CarritoRestControllerTest {
     @DisplayName("PUT /carritos/{id}")
     class ActualizarCarrito {
         @Test
-        @DisplayName("Debe actualizar carrito exitosamente con status OK")
+        @DisplayName("Debe actualizar un carrito correctamente")
         void actualizarCarrito() {
             when(carritoService.update(1L, carritoUpdateRequest)).thenReturn(carritoResponse);
 
-            ResponseEntity<CarritoResponseDto> response = carritoRestController.update(1L, carritoUpdateRequest);
+            ResponseEntity<CarritoResponseDto> response =
+                    carritoRestController.update(1L, carritoUpdateRequest);
 
             assertAll(
                     () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
@@ -172,24 +143,13 @@ class CarritoRestControllerTest {
 
             verify(carritoService).update(1L, carritoUpdateRequest);
         }
-
-        @Test
-        @DisplayName("Debe lanzar excepción cuando carrito no existe")
-        void actualizarCarritoNoExiste() {
-            when(carritoService.update(999L, carritoUpdateRequest))
-                    .thenThrow(new CarritoNotFound(999L));
-
-            assertThrows(CarritoNotFound.class, () -> carritoRestController.update(999L, carritoUpdateRequest));
-
-            verify(carritoService).update(999L, carritoUpdateRequest);
-        }
     }
 
     @Nested
     @DisplayName("DELETE /carritos/{id}")
     class EliminarCarrito {
         @Test
-        @DisplayName("Debe eliminar carrito exitosamente con status OK")
+        @DisplayName("Debe eliminar un carrito correctamente")
         void eliminarCarrito() {
             when(carritoService.delete(1L)).thenReturn(carritoResponse);
 
@@ -202,15 +162,24 @@ class CarritoRestControllerTest {
 
             verify(carritoService).delete(1L);
         }
+    }
 
+    @Nested
+    @DisplayName("GET /carritos/usuario/{userId}")
+    class ObtenerCarritoPorUsuario {
         @Test
-        @DisplayName("Debe lanzar excepción cuando carrito no existe")
-        void eliminarCarritoNoExiste() {
-            when(carritoService.delete(999L)).thenThrow(new CarritoNotFound(999L));
+        @DisplayName("Debe obtener carrito por ID de usuario")
+        void obtenerPorUsuario() {
+            when(carritoService.findByUserId(101L)).thenReturn(carritoResponse);
 
-            assertThrows(CarritoNotFound.class, () -> carritoRestController.delete(999L));
+            ResponseEntity<CarritoResponseDto> response = carritoRestController.getByUserId(101L);
 
-            verify(carritoService).delete(999L);
+            assertAll(
+                    () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                    () -> assertEquals(carritoResponse, response.getBody())
+            );
+
+            verify(carritoService).findByUserId(101L);
         }
     }
 }

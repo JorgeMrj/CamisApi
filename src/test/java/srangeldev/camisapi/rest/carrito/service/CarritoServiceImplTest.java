@@ -1,7 +1,7 @@
 package srangeldev.camisapi.rest.carrito.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,13 +18,11 @@ import srangeldev.camisapi.rest.carrito.models.Carrito;
 import srangeldev.camisapi.rest.carrito.repository.CarritoRepository;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -43,182 +41,208 @@ class CarritoServiceImplTest {
     @InjectMocks
     private CarritoServiceImpl carritoService;
 
-    private Carrito carrito;
-    private CarritoResponseDto carritoResponseDto;
-    private CarritoCreateRequestDto carritoCreateRequestDto;
-    private CarritoUpdateRequestDto carritoUpdateRequestDto;
+    private final Carrito carrito = Carrito.builder()
+            .id(1L)
+            .userId(101L)
+            .productos(new ArrayList<>())
+            .creadoEn(LocalDateTime.now())
+            .modificadoEn(LocalDateTime.now())
+            .build();
 
-    @BeforeEach
-    void setUp() {
-        carrito = Carrito.builder()
-                .id(1L)
-                .userId(101L)
-                .items(Arrays.asList("item1", "item2"))
-                .creadoEn(LocalDateTime.now())
-                .modificadoEn(LocalDateTime.now())
-                .build();
+    private final CarritoResponseDto carritoResponse = CarritoResponseDto.builder()
+            .id(1L)
+            .userId(101L)
+            .productos(new ArrayList<>())
+            .totalProductos(0)
+            .creadoEn(LocalDateTime.now())
+            .modificadoEn(LocalDateTime.now())
+            .build();
 
-        carritoResponseDto = CarritoResponseDto.builder()
-                .id(1L)
-                .userId(101L)
-                .items(Arrays.asList("item1", "item2"))
-                .totalItems(2)
-                .creadoEn(LocalDateTime.now())
-                .modificadoEn(LocalDateTime.now())
-                .build();
+    private final CarritoCreateRequestDto carritoCreateRequest = CarritoCreateRequestDto.builder()
+            .userId(101L)
+            .productos(new ArrayList<>())
+            .build();
 
-        carritoCreateRequestDto = CarritoCreateRequestDto.builder()
-                .userId(101L)
-                .items(Arrays.asList("item1"))
-                .build();
+    private final CarritoUpdateRequestDto carritoUpdateRequest = CarritoUpdateRequestDto.builder()
+            .id(1L)
+            .productos(new ArrayList<>())
+            .accion("REEMPLAZAR")
+            .productoId(1L)
+            .build();
 
-        carritoUpdateRequestDto = CarritoUpdateRequestDto.builder()
-                .id(1L)
-                .items(Arrays.asList("item1", "item2", "item3"))
-                .accion("REEMPLAZAR")
-                .productoId("item3")
-                .build();
+    @Nested
+    @DisplayName("GET /api/carritos")
+    class ObtenerTodosLosCarritos {
+        @Test
+        @DisplayName("Debe obtener todos los carritos")
+        void obtenerTodos() {
+            when(carritoRepository.findAll()).thenReturn(List.of(carrito));
+            when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponse);
+
+            List<CarritoResponseDto> result = carritoService.getAll();
+
+            assertAll(
+                    () -> assertEquals(1, result.size()),
+                    () -> assertEquals(carritoResponse, result.get(0))
+            );
+
+            verify(carritoRepository, times(1)).findAll();
+            verify(carritoMapper, times(1)).toResponseDto(carrito);
+        }
     }
 
-    @Test
-    @DisplayName("getAll - Debe retornar lista de carritos")
-    void testGetAll() {
-        List<Carrito> carritos = Arrays.asList(carrito);
-        when(carritoRepository.findAll()).thenReturn(carritos);
-        when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponseDto);
+    @Nested
+    @DisplayName("GET /api/carritos/{id}")
+    class ObtenerCarritoPorId {
+        @Test
+        @DisplayName("Debe obtener un carrito por su ID")
+        void obtenerPorId() {
+            when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
+            when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponse);
 
-        List<CarritoResponseDto> resultado = carritoService.getAll();
+            CarritoResponseDto result = carritoService.getById(1L);
 
-        assertThat(resultado).hasSize(1);
-        assertThat(resultado.get(0).getId()).isEqualTo(1L);
-        verify(carritoRepository).findAll();
+            assertEquals(carritoResponse, result);
+            verify(carritoRepository).findById(1L);
+            verify(carritoMapper).toResponseDto(carrito);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar excepción cuando el carrito no existe")
+        void obtenerPorIdNoExiste() {
+            when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
+
+            assertThrows(CarritoNotFound.class, () -> carritoService.getById(1L));
+            verify(carritoRepository).findById(1L);
+        }
     }
 
-    @Test
-    @DisplayName("getById - Debe retornar carrito cuando existe")
-    void testGetById_Existe() {
-        when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
-        when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponseDto);
+    @Nested
+    @DisplayName("POST /api/carritos")
+    class CrearCarrito {
+        @Test
+        @DisplayName("Debe crear un nuevo carrito correctamente")
+        void crearCarrito() {
+            when(carritoRepository.findByUserId(101L)).thenReturn(Optional.empty());
+            when(carritoMapper.toEntity(carritoCreateRequest)).thenReturn(carrito);
+            when(carritoRepository.save(carrito)).thenReturn(carrito);
+            when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponse);
 
-        CarritoResponseDto resultado = carritoService.getById(1L);
+            CarritoResponseDto result = carritoService.save(carritoCreateRequest);
 
-        assertThat(resultado.getId()).isEqualTo(1L);
-        verify(carritoRepository).findById(1L);
+            assertEquals(carritoResponse, result);
+            verify(carritoRepository).findByUserId(101L);
+            verify(carritoMapper).toEntity(carritoCreateRequest);
+            verify(carritoRepository).save(carrito);
+            verify(carritoMapper).toResponseDto(carrito);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar excepción cuando ya existe carrito para el usuario")
+        void crearCarritoYaExiste() {
+            when(carritoRepository.findByUserId(101L)).thenReturn(Optional.of(carrito));
+
+            assertThrows(CarritoException.class, () -> carritoService.save(carritoCreateRequest));
+            verify(carritoRepository).findByUserId(101L);
+        }
     }
 
-    @Test
-    @DisplayName("getById - Debe lanzar excepción cuando no existe")
-    void testGetById_NoExiste() {
-        when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
+    @Nested
+    @DisplayName("PUT /api/carritos/{id}")
+    class ActualizarCarrito {
+        @Test
+        @DisplayName("Debe actualizar un carrito correctamente")
+        void actualizarCarrito() {
+            when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
+            when(carritoRepository.save(any(Carrito.class))).thenReturn(carrito);
+            when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponse);
 
-        assertThrows(CarritoNotFound.class, () -> carritoService.getById(1L));
+            CarritoResponseDto result = carritoService.update(1L, carritoUpdateRequest);
+
+            assertEquals(carritoResponse, result);
+            verify(carritoRepository, times(2)).findById(1L);
+            verify(carritoMapper).updateFromDto(carrito, carritoUpdateRequest);
+            verify(carritoRepository).save(any(Carrito.class));
+            verify(carritoMapper).toResponseDto(carrito);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar excepción cuando el carrito no existe")
+        void actualizarCarritoNoExiste() {
+            when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
+
+            assertThrows(CarritoNotFound.class, () -> carritoService.update(1L, carritoUpdateRequest));
+            verify(carritoRepository, times(2)).findById(1L);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar excepción cuando ID ya existe en otro carrito")
+        void actualizarIdYaExisteEnOtroCarrito() {
+            CarritoUpdateRequestDto dtoConIdDiferente = CarritoUpdateRequestDto.builder()
+                    .id(2L)
+                    .productos(new ArrayList<>())
+                    .accion("REEMPLAZAR")
+                    .productoId(1L)
+                    .build();
+
+            Carrito otroCarrito = Carrito.builder().id(2L).userId(102L).build();
+            when(carritoRepository.findById(2L)).thenReturn(Optional.of(otroCarrito));
+
+            assertThrows(CarritoException.class, () -> carritoService.update(1L, dtoConIdDiferente));
+            verify(carritoRepository).findById(2L);
+        }
     }
 
-    @Test
-    @DisplayName("save - Debe crear carrito cuando no existe")
-    void testSave_Exitoso() {
-        when(carritoRepository.findByUserId(101L)).thenReturn(Optional.empty());
-        when(carritoMapper.toEntity(carritoCreateRequestDto)).thenReturn(carrito);
-        when(carritoRepository.save(carrito)).thenReturn(carrito);
-        when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponseDto);
+    @Nested
+    @DisplayName("DELETE /api/carritos/{id}")
+    class EliminarCarrito {
+        @Test
+        @DisplayName("Debe eliminar un carrito correctamente")
+        void eliminarCarrito() {
+            when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
+            when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponse);
 
-        CarritoResponseDto resultado = carritoService.save(carritoCreateRequestDto);
+            CarritoResponseDto result = carritoService.delete(1L);
 
-        assertThat(resultado.getId()).isEqualTo(1L);
-        verify(carritoRepository).save(carrito);
+            assertEquals(carritoResponse, result);
+            verify(carritoRepository).findById(1L);
+            verify(carritoRepository).delete(carrito);
+            verify(carritoMapper).toResponseDto(carrito);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar excepción cuando el carrito no existe")
+        void eliminarCarritoNoExiste() {
+            when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
+
+            assertThrows(CarritoNotFound.class, () -> carritoService.delete(1L));
+            verify(carritoRepository).findById(1L);
+        }
     }
 
-    @Test
-    @DisplayName("save - Debe lanzar excepción cuando carrito ya existe")
-    void testSave_CarritoYaExiste() {
-        when(carritoRepository.findByUserId(101L)).thenReturn(Optional.of(carrito));
+    @Nested
+    @DisplayName("GET /api/carritos/usuario/{userId}")
+    class ObtenerCarritoPorUsuario {
+        @Test
+        @DisplayName("Debe obtener carrito por ID de usuario")
+        void obtenerPorUsuario() {
+            when(carritoRepository.findByUserId(101L)).thenReturn(Optional.of(carrito));
+            when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponse);
 
-        assertThrows(CarritoException.class, () -> carritoService.save(carritoCreateRequestDto));
-    }
+            CarritoResponseDto result = carritoService.findByUserId(101L);
 
-    @Test
-    @DisplayName("update - Debe actualizar carrito existente")
-    void testUpdate_Exitoso() {
-        when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
-        when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
-        when(carritoRepository.save(any(Carrito.class))).thenReturn(carrito);
-        when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponseDto);
+            assertEquals(carritoResponse, result);
+            verify(carritoRepository).findByUserId(101L);
+            verify(carritoMapper).toResponseDto(carrito);
+        }
 
-        CarritoResponseDto resultado = carritoService.update(1L, carritoUpdateRequestDto);
+        @Test
+        @DisplayName("Debe lanzar excepción cuando no existe carrito para el usuario")
+        void obtenerPorUsuarioNoExiste() {
+            when(carritoRepository.findByUserId(101L)).thenReturn(Optional.empty());
 
-        assertThat(resultado.getId()).isEqualTo(1L);
-        verify(carritoRepository, times(2)).findById(1L);
-        verify(carritoRepository).save(any(Carrito.class));
-        verify(carritoMapper).updateFromDto(carrito, carritoUpdateRequestDto);
-    }
-
-    @Test
-    @DisplayName("update - Debe lanzar excepción cuando carrito no existe")
-    void testUpdate_CarritoNoExiste() {
-        when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
-        when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
-
-
-        assertThrows(CarritoNotFound.class, () -> carritoService.update(1L, carritoUpdateRequestDto));
-
-        verify(carritoRepository, times(2)).findById(1L);
-    }
-
-    @Test
-    @DisplayName("update - Debe lanzar excepción cuando ID ya existe en otro carrito")
-    void testUpdate_IdYaExisteEnOtroCarrito() {
-        CarritoUpdateRequestDto dtoConIdDiferente = CarritoUpdateRequestDto.builder()
-                .id(2L)
-                .items(Arrays.asList("item1", "item2"))
-                .accion("REEMPLAZAR")
-                .productoId("item2")
-                .build();
-
-        Carrito otroCarrito = Carrito.builder().id(2L).userId(102L).build();
-        when(carritoRepository.findById(2L)).thenReturn(Optional.of(otroCarrito));
-
-        assertThrows(CarritoException.class, () -> carritoService.update(1L, dtoConIdDiferente));
-
-        verify(carritoRepository).findById(2L);
-    }
-
-    @Test
-    @DisplayName("delete - Debe eliminar carrito existente")
-    void testDelete_Exitoso() {
-        when(carritoRepository.findById(1L)).thenReturn(Optional.of(carrito));
-        when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponseDto);
-
-        CarritoResponseDto resultado = carritoService.delete(1L);
-
-        assertThat(resultado.getId()).isEqualTo(1L);
-        verify(carritoRepository).delete(carrito);
-    }
-
-    @Test
-    @DisplayName("delete - Debe lanzar excepción cuando carrito no existe")
-    void testDelete_CarritoNoExiste() {
-        when(carritoRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(CarritoNotFound.class, () -> carritoService.delete(1L));
-    }
-
-    @Test
-    @DisplayName("findByUserId - Debe retornar carrito cuando existe")
-    void testFindByUserId_Existe() {
-        when(carritoRepository.findByUserId(101L)).thenReturn(Optional.of(carrito));
-        when(carritoMapper.toResponseDto(carrito)).thenReturn(carritoResponseDto);
-
-        CarritoResponseDto resultado = carritoService.findByUserId(101L);
-
-        assertThat(resultado.getId()).isEqualTo(1L);
-        verify(carritoRepository).findByUserId(101L);
-    }
-
-    @Test
-    @DisplayName("findByUserId - Debe lanzar excepción cuando no existe")
-    void testFindByUserId_NoExiste() {
-        when(carritoRepository.findByUserId(101L)).thenReturn(Optional.empty());
-
-        assertThrows(CarritoBadId.class, () -> carritoService.findByUserId(101L));
+            assertThrows(CarritoBadId.class, () -> carritoService.findByUserId(101L));
+            verify(carritoRepository).findByUserId(101L);
+        }
     }
 }
