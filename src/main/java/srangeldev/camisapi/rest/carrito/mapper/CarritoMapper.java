@@ -100,14 +100,5 @@ public class CarritoMapper {
         return carrito;
     }
 
-    /**
-     * Crea un nuevo DTO de respuesta a partir de una entidad
-     * Método de conveniencia que es un alias para toResponseDto
-     *
-     * @param carrito Entidad Carrito
-     * @return DTO de respuesta
-     */
-    public CarritoResponseDto fromEntity(Carrito carrito) {
-        return toResponseDto(carrito);
-    }
+
 }
