@@ -46,7 +46,7 @@ public class Pedido {
      */
     @NotNull(message = "El usuario no puede ser nulo")
     @Column(name = "user_id", nullable = false, length = 24)
-    private Long userId;
+    private String  userId;
     
     /**
      * Estado actual del pedido
@@ -62,10 +62,8 @@ public class Pedido {
      * Fecha de creación del pedido
      * Se establece automáticamente al crear el pedido
      */
-    @CreationTimestamp
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
     
     /**
      * Total del pedido en euros

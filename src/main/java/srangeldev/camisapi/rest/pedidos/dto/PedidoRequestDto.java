@@ -5,6 +5,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,12 +27,13 @@ import java.util.List;
 @Data
 public class PedidoRequestDto {
     @NotNull(message = "El usuario no puede ser nulo")
-    private Long userId;
+    private String userId;
 
     @NotNull(message = "El total no puede ser nulo")
     @Positive(message = "El total debe ser mayor que 0")
     private Double total;
 
     @NotNull(message = "Debe incluir al menos un producto")
+    @Size(min = 1, message = "Debe incluir mínimo 1 producto")
     private List<DetallePedidoDto> detalles;
 }

@@ -53,7 +53,7 @@ public class PedidoController {
      * Obtiene pedidos por el ID del usuario (String, MongoDB)
      */
     @GetMapping("/usuario/{userId}")
-    public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorUsuario(@PathVariable Long userId) {
+    public ResponseEntity<List<PedidoResponseDto>> obtenerPedidosPorUsuario(@PathVariable String userId) {
         List<PedidoResponseDto> pedidos = pedidoService.findByUsuario(userId);
         return ResponseEntity.ok(pedidos);
     }
@@ -73,7 +73,7 @@ public class PedidoController {
     @PatchMapping("/{id}/estado")
     public ResponseEntity<PedidoResponseDto> actualizarEstado(
             @PathVariable Long id,
-            @RequestParam EstadoPedido estado
+            @Valid @RequestParam EstadoPedido estado
     ) {
         return ResponseEntity.ok(pedidoService.actualizarEstado(id, estado));
     }

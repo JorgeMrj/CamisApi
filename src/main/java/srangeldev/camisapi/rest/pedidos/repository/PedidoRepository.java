@@ -23,7 +23,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long>{
      * @param userId identificador del usuario
      * @return lista de pedidos pertenecientes al usuario indicado
      */
-    List<Pedido> findByUserId(Long userId);
+    List<Pedido> findByUserId(String userId);
 
     /**
      * Obtiene los pedidos filtrados por su estado actual.
