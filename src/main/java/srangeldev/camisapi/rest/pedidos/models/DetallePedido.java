@@ -33,7 +33,7 @@ public class DetallePedido {
      */
     @NotNull(message = "El ID del producto no puede ser nulo")
     @Column(name = "producto_id", nullable = false)
-    private Long productoId;
+    private String productoId;
     
     /**
      * Nombre del producto en el momento de la venta
