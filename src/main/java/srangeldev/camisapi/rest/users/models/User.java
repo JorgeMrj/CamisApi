@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 
 /**
  * Modelo User - MongoDB
- * 
+ *
  * Almacena la información de usuarios del sistema.
  * Es el único modelo que se guarda en MongoDB según la arquitectura híbrida.
- * 
+ *
  * Utiliza @Document para indicar que es un documento de MongoDB
  * y @TypeAlias para indicar con qué clase se van a mapear a la hora de recuperarlos de la base de datos.
  */

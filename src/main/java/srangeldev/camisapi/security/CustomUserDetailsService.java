@@ -5,17 +5,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import srangeldev.camisapi.security.repository.UserEntityRepository;
+import srangeldev.camisapi.rest.users.repositories.UserRepository;
 
 /**
  * Servicio simple para cargar usuarios para autenticación
- * Implementación básica para estudiantes de DAW usando H2
+ * Implementación básica para estudiantes de DAW usando MongoDB
  */
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserEntityRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

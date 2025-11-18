@@ -19,13 +19,23 @@ public class SecurityDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("Cargando usuarios por defecto...");
+        try {
+            log.info("Intentando cargar usuarios por defecto...");
 
-        authService.createDefaultUser();
-        authService.createTestUser();
+            authService.createDefaultUser();
+            authService.createTestUser();
 
-        log.info("Usuarios creados:");
-        log.info("Admin - username: admin, password: admin123");
-        log.info("User - username: user, password: user123");
+            log.info("✓ Usuarios creados exitosamente:");
+            log.info("  - Admin: username=admin, password=admin123");
+            log.info("  - User:  username=user,  password=user123");
+
+        } catch (Exception e) {
+            log.warn("⚠️ No se pudieron crear usuarios por defecto (probablemente MongoDB no disponible)");
+            log.warn("   Para testing JWT, asegúrate de tener MongoDB ejecutándose en localhost:27017");
+            log.warn("   Error: {}", e.getMessage());
+
+            // No lanzamos la excepción para que la aplicación siga funcionando
+            // Solo los endpoints que requieren autenticación fallarán
+        }
     }
 }
