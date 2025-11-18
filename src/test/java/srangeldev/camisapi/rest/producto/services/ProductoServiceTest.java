@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.socket.WebSocketHandler;
 import srangeldev.camisapi.rest.productos.dto.ProductoRequestDTO;
 import srangeldev.camisapi.rest.productos.dto.ProductoResponseDTO;
 import srangeldev.camisapi.rest.productos.mapper.ProductoMapper;
@@ -32,6 +33,9 @@ class ProductoServiceTest {
 
     @Mock
     private ProductoMapper productoMapper;
+
+    @Mock
+    private srangeldev.camisapi.websocket.config.WebSocketHandler webSocketHandler;
 
     @InjectMocks
     private ProductoService productoService;
@@ -95,7 +99,9 @@ class ProductoServiceTest {
 
             assertAll(
                     () -> assertEquals(responseDTO.getNombre(), resultado.getNombre()),
-                    () -> verify(productoRepository, times(1)).save(producto)
+                    () -> verify(productoRepository, times(1)).save(producto),
+                    () -> verify(webSocketHandler, times(1))
+                            .enviarMensajeATodos("Producto creado:" + producto.getNombre())
             );
         }
     }
@@ -117,7 +123,9 @@ class ProductoServiceTest {
 
             assertAll(
                     () -> assertEquals(1, resultados.size()),
-                    () -> assertEquals("Camiseta Real Madrid", resultados.get(0).getNombre())
+                    () -> assertEquals("Camiseta Real Madrid", resultados.get(0).getNombre()),
+                    () -> verify(webSocketHandler, times(1))
+                            .enviarMensajeATodos("Productos listados correctamente")
             );
         }
     }
@@ -137,7 +145,11 @@ class ProductoServiceTest {
 
             ProductoResponseDTO resultado = productoService.obtenerPorId("1");
 
-            assertEquals("Camiseta Real Madrid", resultado.getNombre());
+            assertAll(
+                    () -> assertEquals("Camiseta Real Madrid", resultado.getNombre()),
+                    () -> verify(webSocketHandler, times(1))
+                            .enviarMensajeATodos("Producto obtenido con id:1")
+            );
         }
 
         @Test
@@ -146,6 +158,7 @@ class ProductoServiceTest {
             when(productoRepository.findById("2")).thenReturn(Optional.empty());
 
             assertThrows(ProductoNotFound.class, () -> productoService.obtenerPorId("2"));
+            verify(webSocketHandler, never()).enviarMensajeATodos(anyString());
         }
     }
 
@@ -165,8 +178,12 @@ class ProductoServiceTest {
 
             ProductoResponseDTO resultado = productoService.actualizarProducto("1", requestDTO);
 
-            assertEquals("Camiseta Real Madrid", resultado.getNombre());
-            verify(productoRepository, times(1)).save(producto);
+            assertAll(
+                    () -> assertEquals("Camiseta Real Madrid", resultado.getNombre()),
+                    () -> verify(productoRepository, times(1)).save(producto),
+                    () -> verify(webSocketHandler, times(1))
+                            .enviarMensajeATodos("Producto actualizado con id:1")
+            );
         }
 
         @Test
@@ -175,6 +192,7 @@ class ProductoServiceTest {
             when(productoRepository.findById("2")).thenReturn(Optional.empty());
 
             assertThrows(ProductoNotFound.class, () -> productoService.actualizarProducto("2", requestDTO));
+            verify(webSocketHandler, never()).enviarMensajeATodos(anyString());
         }
     }
 
@@ -186,21 +204,34 @@ class ProductoServiceTest {
     class EliminarProducto {
 
         @Test
-        @DisplayName("Debería eliminar producto si existe")
+        @DisplayName("Debería eliminar el producto si existe")
         void eliminarProducto_ok() {
-            when(productoRepository.existsById("1")).thenReturn(true);
+            when(productoRepository.findById("1")).thenReturn(Optional.of(producto));
 
             productoService.eliminarProducto("1");
 
+            verify(productoRepository, times(1)).findById("1");
             verify(productoRepository, times(1)).deleteById("1");
+            verify(webSocketHandler, times(1))
+                    .enviarMensajeATodos("Producto eliminado con id1");
         }
 
         @Test
-        @DisplayName("Debería lanzar excepción si no existe")
+        @DisplayName("Debería lanzar excepción si el producto no existe")
         void eliminarProducto_notFound() {
-            when(productoRepository.existsById("2")).thenReturn(false);
 
-            assertThrows(ProductoNotFound.class, () -> productoService.eliminarProducto("2"));
+            when(productoRepository.findById("1"))
+                    .thenReturn(Optional.empty());
+
+            ProductoNotFound exception = assertThrows(
+                    ProductoNotFound.class,
+                    () -> productoService.eliminarProducto("1")
+            );
+
+            assertTrue(exception.getMessage().contains("No se encontro el producto"));
+
+            verify(productoRepository, times(1)).findById("1");
+            verify(productoRepository, never()).deleteById(anyString());
         }
     }
 

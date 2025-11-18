@@ -30,34 +30,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
         System.out.println("Cliente desconectado: " + session.getId());
     }
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        System.out.println("Mensaje recibido de " + session.getId() + ": " + message.getPayload());
-        broadcast(message.getPayload()); // reenvía a todos
-    }
-
-    // Enviar mensaje a todos los clientes conectados
-    public void broadcast(String payload) {
-        synchronized (sessions) {
-            for (WebSocketSession session : sessions) {
-                try {
-                    if (session.isOpen()) {
-                        session.sendMessage(new TextMessage(payload));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+    public void enviarMensajeATodos(String mensaje) {
+        sessions.forEach(session -> {
+            try {
+                session.sendMessage(new TextMessage(mensaje));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }
-    }
-
-    // Enviar cualquier objeto como JSON
-    public void broadcastObject(Object obj) {
-        try {
-            String json = objectMapper.writeValueAsString(obj);
-            broadcast(json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
     }
 }

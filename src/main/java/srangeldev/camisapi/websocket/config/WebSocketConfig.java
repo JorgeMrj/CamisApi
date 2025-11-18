@@ -12,24 +12,23 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    @Value("${api.version:v1}") // Puedes poner un valor por defecto
+    @Value("${api.version:v1}")
     private String apiVersion;
 
-    private final WebSocketHandler productosWebSocketHandler;
+    private final WebSocketHandler webSocketHandler;
 
-    public WebSocketConfig(WebSocketHandler productosWebSocketHandler) {
-        this.productosWebSocketHandler = productosWebSocketHandler;
+    public WebSocketConfig(WebSocketHandler webSocketHandler) {
+        this.webSocketHandler = webSocketHandler;
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(productosWebSocketHandler, "/ws/" + apiVersion + "/productos")
-                .setAllowedOriginPatterns("*"); // Permitir todos los orígenes
+        registry.addHandler(webSocketHandler, "/ws/" + apiVersion + "/productos")
+                .setAllowedOriginPatterns("*");
     }
 
-    // Si necesitas exponer más handlers, solo añádelos como beans y rutas diferentes
-    //@Bean
-    //public WebSocketHandler productosWebSocketHandler() {
-        //return new ProductosWebSocketHandler();
-    //}
+    @Bean
+    public WebSocketHandler productosWebSocketHandler() {
+        return new srangeldev.camisapi.websocket.config.WebSocketHandler();
+    }
 }

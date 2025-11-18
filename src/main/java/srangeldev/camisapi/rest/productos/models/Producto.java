@@ -1,14 +1,11 @@
 package srangeldev.camisapi.rest.productos.models;
 
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.LocalDate;
 
@@ -19,8 +16,6 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document("productos")
-@TypeAlias("Producto")
 public class Producto {
 
     /**
@@ -35,7 +30,6 @@ public class Producto {
      */
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 200, message = "El nombre no puede tener más de 200 caracteres")
-    @Indexed
     private String nombre;
 
     /**
@@ -44,7 +38,6 @@ public class Producto {
      */
     @NotBlank(message = "El equipo no puede estar vacío")
     @Size(max = 100, message = "El equipo no puede tener más de 100 caracteres")
-    @Indexed
     private String equipo;
 
     /**

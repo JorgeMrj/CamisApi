@@ -249,5 +249,4 @@ import static org.mockito.Mockito.*;
             assertThrows(PedidoNotFoundException.class, () -> pedidoService.eliminarPedido(3L));
         }
     }
-
 }

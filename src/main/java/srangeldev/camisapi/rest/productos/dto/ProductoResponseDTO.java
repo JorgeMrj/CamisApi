@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import srangeldev.camisapi.rest.productos.models.EstadoProducto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
