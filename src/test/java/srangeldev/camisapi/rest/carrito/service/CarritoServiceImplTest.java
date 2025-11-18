@@ -44,7 +44,7 @@ class CarritoServiceImplTest {
     private final Carrito carrito = Carrito.builder()
             .id(1L)
             .userId(101L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .creadoEn(LocalDateTime.now())
             .modificadoEn(LocalDateTime.now())
             .build();
@@ -52,7 +52,7 @@ class CarritoServiceImplTest {
     private final CarritoResponseDto carritoResponse = CarritoResponseDto.builder()
             .id(1L)
             .userId(101L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .totalProductos(0)
             .creadoEn(LocalDateTime.now())
             .modificadoEn(LocalDateTime.now())
@@ -60,14 +60,14 @@ class CarritoServiceImplTest {
 
     private final CarritoCreateRequestDto carritoCreateRequest = CarritoCreateRequestDto.builder()
             .userId(101L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .build();
 
     private final CarritoUpdateRequestDto carritoUpdateRequest = CarritoUpdateRequestDto.builder()
             .id(1L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .accion("REEMPLAZAR")
-            .productoId(1L)
+            .productoId("1")
             .build();
 
     @Nested
@@ -177,12 +177,12 @@ class CarritoServiceImplTest {
 
         @Test
         @DisplayName("Debe lanzar excepción cuando ID ya existe en otro carrito")
-        void actualizarIdYaExisteEnOtroCarrito() {
+        void testUpdate_IdYaExisteEnOtroCarrito() {
             CarritoUpdateRequestDto dtoConIdDiferente = CarritoUpdateRequestDto.builder()
                     .id(2L)
-                    .productos(new ArrayList<>())
+                    .productosIds(new ArrayList<>())
                     .accion("REEMPLAZAR")
-                    .productoId(1L)
+                    .productoId("1")
                     .build();
 
             Carrito otroCarrito = Carrito.builder().id(2L).userId(102L).build();
