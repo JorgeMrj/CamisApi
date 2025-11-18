@@ -76,4 +76,24 @@ public class User implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return !isDeleted;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !isDeleted;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return !isDeleted;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return !isDeleted;
+    }
 }
