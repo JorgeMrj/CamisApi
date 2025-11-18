@@ -29,7 +29,7 @@ public class CarritoMapper {
 
         return Carrito.builder()
                 .userId(createDto.getUserId())
-                .productos(createDto.getProductos() != null ? new ArrayList<>(createDto.getProductos()) : new ArrayList<>())
+                .productosIds(createDto.getProductosIds() != null ? new ArrayList<>(createDto.getProductosIds()) : new ArrayList<>())
                 .creadoEn(LocalDateTime.now())
                 .modificadoEn(LocalDateTime.now())
                 .build();
@@ -49,8 +49,8 @@ public class CarritoMapper {
         return CarritoResponseDto.builder()
                 .id(carrito.getId())
                 .userId(carrito.getUserId())
-                .productos(carrito.getProductos())
-                .totalProductos(carrito.getProductos() != null ? carrito.getProductos().size() : 0)
+                .productosIds(carrito.getProductosIds())
+                .totalProductos(carrito.getProductosIds() != null ? carrito.getProductosIds().size() : 0)
                 .modificadoEn(carrito.getModificadoEn())
                 .creadoEn(carrito.getCreadoEn())
                 .build();
@@ -73,24 +73,26 @@ public class CarritoMapper {
 
         if ("REEMPLAZAR".equals(accion) || accion == null) {
             // Reemplazar toda la lista de productos
-            if (updateDto.getProductos() != null) {
-                carrito.setProductos(new ArrayList<>(updateDto.getProductos()));
+            if (updateDto.getProductosIds() != null) {
+                carrito.setProductosIds(new ArrayList<>(updateDto.getProductosIds()));
             }
         } else if ("AGREGAR".equals(accion)) {
-            // Agregar un producto específico (aquí necesitaríamos buscar el producto por ID)
-            // Para simplificar, por ahora solo manejamos la lista completa
-            if (updateDto.getProductos() != null) {
-                carrito.setProductos(new ArrayList<>(updateDto.getProductos()));
+            // Agregar un producto específico por ID
+            if (updateDto.getProductosIds() != null && !updateDto.getProductosIds().isEmpty()) {
+                for (String productoId : updateDto.getProductosIds()) {
+                    if (!carrito.getProductosIds().contains(productoId)) {
+                        carrito.getProductosIds().add(productoId);
+                    }
+                }
             }
         } else if ("QUITAR".equals(accion)) {
-            // Quitar un producto específico (aquí necesitaríamos buscar el producto por ID)
-            // Para simplificar, por ahora solo manejamos la lista completa
-            if (updateDto.getProductos() != null) {
-                carrito.setProductos(new ArrayList<>(updateDto.getProductos()));
+            // Quitar productos específicos por ID
+            if (updateDto.getProductosIds() != null) {
+                carrito.getProductosIds().removeAll(updateDto.getProductosIds());
             }
         } else if ("LIMPIAR".equals(accion)) {
             // Limpiar todo el carrito
-            carrito.getProductos().clear();
+            carrito.getProductosIds().clear();
         }
 
         // La fecha de modificación se actualiza automáticamente con @UpdateTimestamp

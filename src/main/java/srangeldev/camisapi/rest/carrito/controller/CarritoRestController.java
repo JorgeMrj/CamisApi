@@ -16,7 +16,7 @@ import srangeldev.camisapi.rest.carrito.service.CarritoServiceImpl;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/carritos/", "/carritos"})
+@RequestMapping({"/api/carritos/", "/api/carritos"})
 public class    CarritoRestController {
     private final CarritoServiceImpl carritoService;
     private final Logger logger = (Logger) LoggerFactory.getLogger(CarritoRestController.class);

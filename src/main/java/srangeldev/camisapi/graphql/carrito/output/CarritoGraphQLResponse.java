@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import srangeldev.camisapi.rest.productos.models.Producto;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class CarritoGraphQLResponse {
 
     private String id;
     private String userId;
-    private List<Producto> items;
+    private List<String> items;
     private Integer totalItems;
     private String modificadoEn;
     private String creadoEn;

@@ -2,12 +2,10 @@ package srangeldev.camisapi.rest.carrito.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import srangeldev.camisapi.rest.productos.models.Producto;
 
 import java.util.List;
 
@@ -28,11 +26,9 @@ public class CarritoUpdateRequestDto {
     private Long id;
 
     /**
-     * Lista actualizada de IDs de productos
+     * Lista actualizada de IDs de productos (referencias a MongoDB)
      */
-    @NotNull(message = "La lista de items no puede ser nula")
-    private List<@NotEmpty(message = "El ID del producto no puede estar vacío")
-            Producto> productos;
+    private List<@NotEmpty(message = "El ID del producto no puede estar vacío") String> productosIds;
 
     /**
      * Acción específica para realizar en el carrito
@@ -43,6 +39,5 @@ public class CarritoUpdateRequestDto {
     /**
      * ID de producto específico para acciones individuales
      */
-   @NotNull(message = "El ID del producto no puede ser nulo")
-    private Long productoId;
+    private String productoId;
 }

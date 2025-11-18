@@ -37,7 +37,7 @@ class CarritoRestControllerTest {
     private final CarritoResponseDto carritoResponse = CarritoResponseDto.builder()
             .id(1L)
             .userId(101L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .totalProductos(0)
             .creadoEn(LocalDateTime.of(2023, 1, 1, 12, 0))
             .modificadoEn(LocalDateTime.of(2023, 1, 1, 12, 0))
@@ -45,14 +45,14 @@ class CarritoRestControllerTest {
 
     private final CarritoCreateRequestDto carritoCreateRequest = CarritoCreateRequestDto.builder()
             .userId(101L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .build();
 
     private final CarritoUpdateRequestDto carritoUpdateRequest = CarritoUpdateRequestDto.builder()
             .id(1L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .accion("REEMPLAZAR")
-            .productoId(1L)
+            .productoId("asdasdasdads")
             .build();
 
     @Nested

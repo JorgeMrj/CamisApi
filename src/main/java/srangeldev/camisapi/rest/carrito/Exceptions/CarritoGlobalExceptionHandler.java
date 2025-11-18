@@ -15,8 +15,8 @@ import java.util.Map;
  * Manejo global de excepciones para el módulo de carrito
  * Permite que los tests funcionen correctamente
  */
-@ControllerAdvice
-public class GlobalExceptionHandler {
+@ControllerAdvice("srangeldev.camisapi.rest.carrito")
+public class CarritoGlobalExceptionHandler {
 
     @ExceptionHandler(CarritoNotFound.class)
     public ResponseEntity<Map<String, Object>> handleCarritoNotFound(CarritoNotFound e) {

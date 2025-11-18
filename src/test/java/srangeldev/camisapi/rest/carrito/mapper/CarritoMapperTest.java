@@ -26,22 +26,22 @@ class CarritoMapperTest {
 
     private final CarritoCreateRequestDto createDto = CarritoCreateRequestDto.builder()
             .userId(101L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .build();
 
     private final Carrito carrito = Carrito.builder()
             .id(1L)
             .userId(101L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .creadoEn(LocalDateTime.now())
             .modificadoEn(LocalDateTime.now())
             .build();
 
     private final CarritoUpdateRequestDto updateDto = CarritoUpdateRequestDto.builder()
             .id(1L)
-            .productos(new ArrayList<>())
+            .productosIds(new ArrayList<>())
             .accion("REEMPLAZAR")
-            .productoId(1L)
+            .productoId("1")
             .build();
 
     @Nested
@@ -57,8 +57,8 @@ class CarritoMapperTest {
                     () -> assertNotNull(resultado),
                     () -> assertNull(resultado.getId()),
                     () -> assertEquals(101L, resultado.getUserId()),
-                    () -> assertNotNull(resultado.getProductos()),
-                    () -> assertTrue(resultado.getProductos().isEmpty()),
+                    () -> assertNotNull(resultado.getProductosIds()),
+                    () -> assertTrue(resultado.getProductosIds().isEmpty()),
                     () -> assertNotNull(resultado.getCreadoEn()),
                     () -> assertNotNull(resultado.getModificadoEn())
             );
@@ -85,7 +85,7 @@ class CarritoMapperTest {
                     () -> assertNotNull(resultado),
                     () -> assertEquals(1L, resultado.getId()),
                     () -> assertEquals(101L, resultado.getUserId()),
-                    () -> assertNotNull(resultado.getProductos()),
+                    () -> assertNotNull(resultado.getProductosIds()),
                     () -> assertEquals(0, resultado.getTotalProductos()),
                     () -> assertEquals(carrito.getCreadoEn(), resultado.getCreadoEn()),
                     () -> assertEquals(carrito.getModificadoEn(), resultado.getModificadoEn())
@@ -105,7 +105,7 @@ class CarritoMapperTest {
             Carrito carritoSinProductos = Carrito.builder()
                     .id(1L)
                     .userId(101L)
-                    .productos(null)
+                    .productosIds(null)
                     .build();
 
             CarritoResponseDto resultado = carritoMapper.toResponseDto(carritoSinProductos);
@@ -126,9 +126,9 @@ class CarritoMapperTest {
         void debeActualizarConAccionReemplazar() {
             CarritoUpdateRequestDto dtoReemplazar = CarritoUpdateRequestDto.builder()
                     .id(1L)
-                    .productos(new ArrayList<>())
+                    .productosIds(new ArrayList<>())
                     .accion("REEMPLAZAR")
-                    .productoId(1L)
+                    .productoId("1")
                     .build();
 
             Carrito resultado = carritoMapper.updateFromDto(carrito, dtoReemplazar);
@@ -136,7 +136,7 @@ class CarritoMapperTest {
             assertAll(
                     () -> assertNotNull(resultado),
                     () -> assertEquals(carrito, resultado),
-                    () -> assertNotNull(resultado.getProductos())
+                    () -> assertNotNull(resultado.getProductosIds())
             );
         }
 
@@ -145,9 +145,9 @@ class CarritoMapperTest {
         void debeActualizarConAccionLimpiar() {
             CarritoUpdateRequestDto dtoLimpiar = CarritoUpdateRequestDto.builder()
                     .id(1L)
-                    .productos(new ArrayList<>())
+                    .productosIds(new ArrayList<>())
                     .accion("LIMPIAR")
-                    .productoId(1L)
+                    .productoId("1")
                     .build();
 
             Carrito resultado = carritoMapper.updateFromDto(carrito, dtoLimpiar);
@@ -155,7 +155,7 @@ class CarritoMapperTest {
             assertAll(
                     () -> assertNotNull(resultado),
                     () -> assertEquals(carrito, resultado),
-                    () -> assertTrue(resultado.getProductos().isEmpty())
+                    () -> assertTrue(resultado.getProductosIds().isEmpty())
             );
         }
 
@@ -164,9 +164,9 @@ class CarritoMapperTest {
         void debeActualizarConAccionAgregar() {
             CarritoUpdateRequestDto dtoAgregar = CarritoUpdateRequestDto.builder()
                     .id(1L)
-                    .productos(new ArrayList<>())
+                    .productosIds(new ArrayList<>())
                     .accion("AGREGAR")
-                    .productoId(1L)
+                    .productoId("1")
                     .build();
 
             Carrito resultado = carritoMapper.updateFromDto(carrito, dtoAgregar);
@@ -174,7 +174,7 @@ class CarritoMapperTest {
             assertAll(
                     () -> assertNotNull(resultado),
                     () -> assertEquals(carrito, resultado),
-                    () -> assertNotNull(resultado.getProductos())
+                    () -> assertNotNull(resultado.getProductosIds())
             );
         }
 
@@ -183,9 +183,9 @@ class CarritoMapperTest {
         void debeActualizarConAccionQuitar() {
             CarritoUpdateRequestDto dtoQuitar = CarritoUpdateRequestDto.builder()
                     .id(1L)
-                    .productos(new ArrayList<>())
+                    .productosIds(new ArrayList<>())
                     .accion("QUITAR")
-                    .productoId(1L)
+                    .productoId("1")
                     .build();
 
             Carrito resultado = carritoMapper.updateFromDto(carrito, dtoQuitar);
@@ -193,7 +193,7 @@ class CarritoMapperTest {
             assertAll(
                     () -> assertNotNull(resultado),
                     () -> assertEquals(carrito, resultado),
-                    () -> assertNotNull(resultado.getProductos())
+                    () -> assertNotNull(resultado.getProductosIds())
             );
         }
 
@@ -202,9 +202,9 @@ class CarritoMapperTest {
         void debeManejadorAccionNull() {
             CarritoUpdateRequestDto dtoSinAccion = CarritoUpdateRequestDto.builder()
                     .id(1L)
-                    .productos(new ArrayList<>())
+                    .productosIds(new ArrayList<>())
                     .accion(null)
-                    .productoId(1L)
+                    .productoId("1")
                     .build();
 
             Carrito resultado = carritoMapper.updateFromDto(carrito, dtoSinAccion);
@@ -212,7 +212,7 @@ class CarritoMapperTest {
             assertAll(
                     () -> assertNotNull(resultado),
                     () -> assertEquals(carrito, resultado),
-                    () -> assertNotNull(resultado.getProductos())
+                    () -> assertNotNull(resultado.getProductosIds())
             );
         }
 
