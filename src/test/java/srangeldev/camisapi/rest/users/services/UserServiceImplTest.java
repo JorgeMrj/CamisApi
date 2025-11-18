@@ -1,6 +1,5 @@
 package srangeldev.camisapi.rest.users.services;
 
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -49,15 +48,15 @@ class UserServiceImplTest {
     private UserResponseDto userResponseDto;
     private UserCreateRequestDto userCreateRequestDto;
     private UserUpdateRequestDto userUpdateRequestDto;
-    private ObjectId userId;
+    private Long userId;
 
     @BeforeEach
     void setUp() {
-        userId = new ObjectId();
+        userId = 1L;
         LocalDateTime now = LocalDateTime.now();
 
         user = User.builder()
-                .id(userId)
+                .idUsuario(userId)
                 .nombre("Test User")
                 .username("testuser")
                 .password("hashedPassword")
@@ -67,7 +66,7 @@ class UserServiceImplTest {
                 .build();
 
         userResponseDto = UserResponseDto.builder()
-                .id(userId.toHexString())
+                .id(userId)
                 .nombre("Test User")
                 .username("testuser")
                 .roles(Set.of(Rol.USER))
@@ -76,6 +75,7 @@ class UserServiceImplTest {
                 .build();
 
         userCreateRequestDto = UserCreateRequestDto.builder()
+                .idUsuario(2L)
                 .nombre("New User")
                 .username("newuser")
                 .password("password123")
@@ -205,6 +205,7 @@ class UserServiceImplTest {
         void save_ShouldSaveUser() {
             // Arrange
             User userToSave = User.builder() // Simula lo que devuelve el mapper
+                    .idUsuario(userCreateRequestDto.getIdUsuario())
                     .nombre(userCreateRequestDto.getNombre())
                     .username(userCreateRequestDto.getUsername())
                     .password(userCreateRequestDto.getPassword())
@@ -212,7 +213,7 @@ class UserServiceImplTest {
                     .build();
 
             User savedUser = User.builder() // Simula lo que devuelve el repo.save()
-                    .id(new ObjectId())
+                    .idUsuario(userCreateRequestDto.getIdUsuario())
                     .nombre(userToSave.getNombre())
                     .username(userToSave.getUsername())
                     .password(userToSave.getPassword())
@@ -221,6 +222,7 @@ class UserServiceImplTest {
                     .updatedAt(LocalDateTime.now())
                     .build();
 
+            when(userRepository.findById(userCreateRequestDto.getIdUsuario())).thenReturn(Optional.empty());
             when(userRepository.findByUsername(userCreateRequestDto.getUsername())).thenReturn(Optional.empty());
             when(userMapper.toUsuario(userCreateRequestDto)).thenReturn(userToSave);
             when(userRepository.save(any(User.class))).thenReturn(savedUser);
@@ -236,12 +238,13 @@ class UserServiceImplTest {
             assertAll(
                     () -> assertNotNull(result),
                     () -> assertEquals(userResponseDto, result),
+                    () -> verify(userRepository, times(1)).findById(userCreateRequestDto.getIdUsuario()),
                     () -> verify(userRepository, times(1)).findByUsername(userCreateRequestDto.getUsername()),
                     () -> verify(userMapper, times(1)).toUsuario(userCreateRequestDto),
                     () -> verify(userRepository, times(1)).save(userCaptor.capture()),
                     () -> verify(userMapper, times(1)).toUsuarioResponseDto(savedUser),
-                    // Verificar que el servicio asignó ID y fechas
-                    () -> assertNotNull(userCaptor.getValue().getId()),
+                    // Verificar que el servicio asignó fechas
+                    () -> assertNotNull(userCaptor.getValue().getIdUsuario()),
                     () -> assertNotNull(userCaptor.getValue().getCreatedAt()),
                     () -> assertNotNull(userCaptor.getValue().getUpdatedAt())
             );
@@ -318,7 +321,7 @@ class UserServiceImplTest {
         @DisplayName("Debe lanzar UserBadRequest si el nuevo username ya existe")
         void update_ShouldThrowUserBadRequestOnDuplicateUsername() {
             // Arrange
-            User existingUserWithSameUsername = User.builder().id(new ObjectId()).username("updateduser").build();
+            User existingUserWithSameUsername = User.builder().idUsuario(999L).username("updateduser").build();
             when(userRepository.findById(userId)).thenReturn(Optional.of(user));
             when(userRepository.findByUsername(userUpdateRequestDto.getUsername())).thenReturn(Optional.of(existingUserWithSameUsername));
 

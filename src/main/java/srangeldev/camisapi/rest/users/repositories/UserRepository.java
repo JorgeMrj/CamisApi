@@ -1,6 +1,5 @@
 package srangeldev.camisapi.rest.users.repositories;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,9 +16,11 @@ import java.util.Optional;
  * 
  * MongoRepository proporciona métodos básicos CRUD y permite definir queries personalizadas
  * usando @Query con sintaxis de MongoDB o mediante la nomenclatura de Spring Data.
+ * 
+ * Ahora usa Long (idUsuario) como tipo de ID principal.
  */
 @Repository
-public interface UserRepository extends MongoRepository<User, ObjectId> {
+public interface UserRepository extends MongoRepository<User, Long> {
 
     /**
      * Busca un usuario por su nombre de usuario (username)

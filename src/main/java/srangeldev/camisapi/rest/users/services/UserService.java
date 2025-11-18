@@ -1,6 +1,5 @@
 package srangeldev.camisapi.rest.users.services;
 
-import org.bson.types.ObjectId;
 import srangeldev.camisapi.rest.users.dto.UserCreateRequestDto;
 import srangeldev.camisapi.rest.users.dto.UserResponseDto;
 import srangeldev.camisapi.rest.users.dto.UserUpdateRequestDto;
@@ -19,12 +18,12 @@ public interface UserService {
     List<UserResponseDto> findAll();
 
     /**
-     * Busca un usuario por su ID (ObjectId).
+     * Busca un usuario por su ID.
      *
-     * @param id ID del usuario (ObjectId).
+     * @param id ID del usuario (Long).
      * @return DTO de respuesta del usuario.
      */
-    UserResponseDto findById(ObjectId id);
+    UserResponseDto findById(Long id);
 
     /**
      * Busca usuarios por nombre.
@@ -45,16 +44,16 @@ public interface UserService {
     /**
      * Actualiza un usuario existente.
      *
-     * @param id                   ID del usuario a actualizar (ObjectId).
+     * @param id                   ID del usuario a actualizar (Long).
      * @param userUpdateRequestDto DTO con los datos a actualizar.
      * @return DTO de respuesta del usuario actualizado.
      */
-    UserResponseDto update(ObjectId id, UserUpdateRequestDto userUpdateRequestDto);
+    UserResponseDto update(Long id, UserUpdateRequestDto userUpdateRequestDto);
 
     /**
      * Elimina un usuario por su ID (borrado físico).
      *
-     * @param id ID del usuario a eliminar (ObjectId).
+     * @param id ID del usuario a eliminar (Long).
      */
-    void deleteById(ObjectId id);
+    void deleteById(Long id);
 }
