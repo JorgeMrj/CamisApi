@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
-import srangeldev.camisapi.rest.productos.models.Producto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,9 +19,9 @@ import java.util.List;
  * Es una entidad transaccional que garantiza la integridad de las reservas.
  * 
  * Comportamiento:
- * - Cuando se añade un producto, su estado cambia a RESERVADO en PostgreSQL
- * - Si se elimina del carrito o expira, el producto vuelve a DISPONIBLE
- * - Los carritos pueden tener un tiempo de expiración para liberar productos
+ * - Cuando se añade un producto, se almacena su ID (referencia a MongoDB)
+ * - Mantiene la lista de IDs de productos del carrito
+ * - Los productos se consultan desde MongoDB cuando sea necesario
  */
 @Data
 @Builder
@@ -41,27 +40,21 @@ public class Carrito {
     
     /**
      * Referencia al ID del Usuario en MongoDB
-     * Se almacena el ID del User (String - ObjectId de MongoDB)
      */
     @NotNull(message = "El usuario no puede ser nulo")
-    @Column(name = "user_id", nullable = false, length = 24)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
     
     /**
-     * Lista de productos en el carrito (relación @OneToMany)
-     * Relación unidireccional desde Carrito hacia Producto
-     * 
-     * IMPORTANTE: Se crea una tabla intermedia carrito_productos automáticamente
+     * Lista de IDs de productos en el carrito
+     * Los productos están en MongoDB, aquí solo se almacenan sus IDs
      */
-    @OneToMany
-    @JoinTable(
-        name = "carrito_productos",
-        joinColumns = @JoinColumn(name = "carrito_id"),
-        inverseJoinColumns = @JoinColumn(name = "producto_id")
-    )
+    @ElementCollection
+    @CollectionTable(name = "carrito_productos", joinColumns = @JoinColumn(name = "carrito_id"))
+    @Column(name = "producto_id")
     @Builder.Default
-    private List<Producto> productos = new ArrayList<>();
-    
+    private List<String> productosIds = new ArrayList<>();
+
     /**
      * Fecha de última modificación del carrito
      * Se actualiza automáticamente con cada cambio

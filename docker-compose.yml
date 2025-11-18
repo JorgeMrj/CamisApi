@@ -4,31 +4,27 @@ networks:
 
 volumes:
   nginx-logs:
-  test-reports-data:
-  doc-reports-data:
-  coverage-reports-data:
-  elasticsearch-data:
+  test-reports:
+  doc-reports:
+  coverage-reports:
   mongodb-data:
   redis-data:
   postgres-data:
 
 services:
-
-  # --- A. SERVICIOS DE BACKEND (AISLADOS) ---
-
-  artifacts-extractor:
+  # Extract artifacts from build
+  artifacts:
     build:
       context: .
       dockerfile: Dockerfile
       target: artifacts
-    container_name: artifacts-extractor
+    container_name: artifacts
     volumes:
-      - test-reports-data:/mnt/test-reports
-      - doc-reports-data:/mnt/doc-reports
-      - coverage-reports-data:/mnt/coverage-reports
+      - test-reports:/mnt/test-reports
+      - doc-reports:/mnt/doc-reports
+      - coverage-reports:/mnt/coverage-reports
 
-  # --- Bases de Datos ---
-  
+  # Databases
   mongodb:
     image: mongo:7.0
     container_name: mongodb
@@ -38,31 +34,10 @@ services:
       MONGO_INITDB_DATABASE: camisapi
     volumes:
       - mongodb-data:/data/db
-    expose:
-      - "27017"
+    ports:
+      - "27017:27017"
     networks:
       - app-network
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    command: redis-server --appendonly yes
-    volumes:
-      - redis-data:/data
-    expose:
-      - "6379"
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   postgres:
     image: postgres:16-alpine
@@ -73,126 +48,72 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  # Servicio de la API
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  # API Service
   api:
     build:
       context: .
       dockerfile: Dockerfile
       target: runtime
+    container_name: api
     environment:
-      # Usa el perfil de Spring para Docker
       SPRING_PROFILES_ACTIVE: docker
-    expose:
-      - "8080" # Aislado. Solo accesible desde 'app-network'
+    ports:
+      - "8080:8080"
     networks:
       - app-network
     depends_on:
-      mongodb:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
+      - mongodb
+      - postgres
+      - redis
 
+  # Report servers
   test-server:
     image: httpd:alpine
     container_name: test-server
-    expose:
-      - "80"
+    ports:
+      - "8081:80"
     volumes:
-      - test-reports-data:/usr/local/apache2/htdocs:ro
+      - test-reports:/usr/local/apache2/htdocs:ro
     networks:
       - app-network
     depends_on:
-      - artifacts-extractor
+      - artifacts
 
   doc-server:
     image: nginx:alpine
     container_name: doc-server
-    expose:
-      - "80"
+    ports:
+      - "8082:80"
     volumes:
-      - doc-reports-data:/usr/share/nginx/html:ro
+      - doc-reports:/usr/share/nginx/html:ro
     networks:
       - app-network
     depends_on:
-      - artifacts-extractor
+      - artifacts
 
   coverage-server:
     image: nginx:alpine
     container_name: coverage-server
-    expose:
-      - "80"
-    volumes:
-      - coverage-reports-data:/usr/share/nginx/html:ro
-    networks:
-      - app-network
-    depends_on:
-      - artifacts-extractor
-
-  # --- B. SERVICIO DE ENTRADA (PROXY) ---
-
-  proxy-nginx:
-    image: nginx:latest
-    container_name: proxy-nginx
     ports:
-      - "80:80"
+      - "8083:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - nginx-logs:/var/log/nginx
+      - coverage-reports:/usr/share/nginx/html:ro
     networks:
       - app-network
     depends_on:
-      - api # <-- CAMBIO AQUÍ (depende del servicio 'api')
-      - test-server
-      - doc-server
-      - coverage-server
-
-  # --- C. PILA DE OBSERVABILIDAD (EFK) ---
-  # Comentado temporalmente hasta configurar fluentd.conf
-  
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
-  #   container_name: elasticsearch
-  #   environment:
-  #     - discovery.type=single-node
-  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  #   volumes:
-  #     - elasticsearch-data:/usr/share/elasticsearch/data
-  #   expose:
-  #     - "9200"
-  #   networks:
-  #     - app-network
-
-  # fluentd:
-  #   image: fluent/fluentd:v1.16-1
-  #   container_name: fluentd
-  #   volumes:
-  #     - ./fluentd.conf:/fluentd/etc/fluent.conf
-  #     - nginx-logs:/var/log/nginx:ro
-  #   networks:
-  #     - app-network
-  #   depends_on:
-  #     - elasticsearch
-
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:7.17.10
-  #   container_name: kibana
-  #   ports:
-  #     - "5601:5601"
-  #   environment:
-  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-  #   networks:
-  #     - app-network
-  #   depends_on:
-  #     - elasticsearch
+      - artifacts

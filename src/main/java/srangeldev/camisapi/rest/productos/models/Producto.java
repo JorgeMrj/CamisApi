@@ -1,39 +1,32 @@
 package srangeldev.camisapi.rest.productos.models;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.*;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
- * Modelo Producto
+ * Modelo Producto - MongoDB
  */
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "productos")
+@Document("productos")
+@TypeAlias("Producto")
 public class Producto {
 
     /**
      * Identificador único del producto
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     /**
@@ -42,7 +35,7 @@ public class Producto {
      */
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 200, message = "El nombre no puede tener más de 200 caracteres")
-    @Column(nullable = false, length = 200)
+    @Indexed
     private String nombre;
 
     /**
@@ -51,7 +44,7 @@ public class Producto {
      */
     @NotBlank(message = "El equipo no puede estar vacío")
     @Size(max = 100, message = "El equipo no puede tener más de 100 caracteres")
-    @Column(nullable = false, length = 100)
+    @Indexed
     private String equipo;
 
     /**
@@ -60,14 +53,12 @@ public class Producto {
      */
     @NotBlank(message = "La talla no puede estar vacía")
     @Size(max = 10, message = "La talla no puede tener más de 10 caracteres")
-    @Column(nullable = false, length = 10)
     private String talla;
 
     /**
      * Descripción detallada del producto
      */
     @Size(max = 1000, message = "La descripción no puede tener más de 1000 caracteres")
-    @Column(length = 1000)
     private String descripcion;
 
     /**
@@ -75,7 +66,6 @@ public class Producto {
      */
     @NotNull(message = "El precio no puede ser nulo")
     @Positive(message = "El precio debe ser positivo")
-    @Column(nullable = false)
     private Double precio;
 
     /**
@@ -99,5 +89,6 @@ public class Producto {
      * Fecha en la que se añadió el producto
      */
     @PastOrPresent(message = "La fecha de creación no puede ser futura")
-    private LocalDate fechaCreacion;
+    @Builder.Default
+    private LocalDate fechaCreacion = LocalDate.now();
 }
