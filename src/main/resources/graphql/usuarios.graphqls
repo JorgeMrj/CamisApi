@@ -1,0 +1,18 @@
+# Schema GraphQL simple para Usuarios (DAW) - Solo consultas
+
+type Usuario {
+    id: ID!
+    nombre: String!
+    username: String!
+    roles: [String!]!
+    creadoEn: String
+    modificadoEn: String
+    esActivo: Boolean!
+    esAdmin: Boolean!
+}
+
+extend type Query {
+    usuarios: [Usuario!]!
+    usuario(id: ID!): Usuario
+    usuariosPorNombre(nombre: String!): [Usuario!]!
+}

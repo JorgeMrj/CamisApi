@@ -7,9 +7,7 @@ import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandle
 import org.springframework.stereotype.Component;
 import srangeldev.camisapi.rest.carrito.Exceptions.CarritoNotFound;
 
-/**
- * Maneja errores de GraphQL para carrito (versión simple)
- */
+
 @Component
 public class CarritoGraphQLExceptionResolver {
 

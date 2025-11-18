@@ -2,19 +2,15 @@ package srangeldev.camisapi.graphql.carrito.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
-import srangeldev.camisapi.graphql.carrito.input.CarritoCreateInput;
 import srangeldev.camisapi.graphql.carrito.mapper.CarritoGraphQLMapper;
 import srangeldev.camisapi.graphql.carrito.output.CarritoGraphQLResponse;
 import srangeldev.camisapi.rest.carrito.service.CarritoService;
 
 import java.util.List;
 
-/**
- * Controlador GraphQL simple para Carrito (DAW)
- */
+
 @Controller
 public class CarritoGraphQLController {
 
@@ -27,7 +23,6 @@ public class CarritoGraphQLController {
         this.mapper = mapper;
     }
 
-    // CONSULTAS
     @QueryMapping
     public List<CarritoGraphQLResponse> carritos() {
         var carritos = carritoService.getAll();
@@ -45,21 +40,6 @@ public class CarritoGraphQLController {
     public CarritoGraphQLResponse carritoByUserId(@Argument String userId) {
         Long userIdLong = Long.parseLong(userId);
         var carrito = carritoService.findByUserId(userIdLong);
-        return mapper.toGraphQLResponse(carrito);
-    }
-
-    // OPERACIONES
-    @MutationMapping
-    public CarritoGraphQLResponse crearCarrito(@Argument CarritoCreateInput input) {
-        var createDto = mapper.toCreateRequestDto(input);
-        var carrito = carritoService.save(createDto);
-        return mapper.toGraphQLResponse(carrito);
-    }
-
-    @MutationMapping
-    public CarritoGraphQLResponse eliminarCarrito(@Argument String id) {
-        Long carritoId = Long.parseLong(id);
-        var carrito = carritoService.delete(carritoId);
         return mapper.toGraphQLResponse(carrito);
     }
 }

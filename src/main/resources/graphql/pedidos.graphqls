@@ -1,0 +1,21 @@
+# Schema GraphQL simple para Pedidos (DAW) - Solo consultas
+
+type Pedido {
+    id: ID!
+    usuario: String!
+    fechaPedido: String!
+    total: Float!
+    estado: String!
+    detalles: [String!]
+    fechaPago: String
+    fechaEnvio: String
+    esPagado: Boolean!
+    esEnviado: Boolean!
+}
+
+extend type Query {
+    pedidos: [Pedido!]!
+    pedido(id: ID!): Pedido
+    pedidosPorUsuario(usuario: String!): [Pedido!]!
+    pedidosPorEstado(estado: String!): [Pedido!]!
+}

@@ -1,0 +1,23 @@
+# Schema GraphQL simple para Productos (DAW) - Solo consultas
+
+type Producto {
+    id: ID!
+    nombre: String!
+    equipo: String!
+    descripcion: String
+    precio: Float!
+    imageUrl: String
+    estado: String!
+    talla: String!
+    fechaCreacion: String
+    esDisponible: Boolean!
+}
+
+extend type Query {
+    productos: [Producto!]!
+    producto(id: ID!): Producto
+    productosPorNombre(nombre: String!): [Producto!]!
+    productosPorEquipo(equipo: String!): [Producto!]!
+    productosPorEstado(estado: String!): [Producto!]!
+    productosPorTalla(talla: String!): [Producto!]!
+}

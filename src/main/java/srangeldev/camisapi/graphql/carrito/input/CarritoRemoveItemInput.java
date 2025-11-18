@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Input GraphQL para remover item del carrito (DAW)
- */
+
 @Data
 @Builder
 @NoArgsConstructor

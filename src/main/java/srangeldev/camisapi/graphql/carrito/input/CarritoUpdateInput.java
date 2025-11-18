@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * Input GraphQL simple para actualizar carrito (DAW)
- */
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -9,17 +9,13 @@ import srangeldev.camisapi.rest.carrito.dto.CarritoResponseDto;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * Mapper simple para GraphQL de carrito (DAW)
- */
+
 @Component
 public class CarritoGraphQLMapper {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    /**
-     * Convierte CarritoCreateInput a CarritoCreateRequestDto
-     */
+
     public CarritoCreateRequestDto toCreateRequestDto(CarritoCreateInput input) {
         if (input == null) {
             return null;
@@ -31,9 +27,6 @@ public class CarritoGraphQLMapper {
                 .build();
     }
 
-    /**
-     * Convierte CarritoResponseDto a CarritoGraphQLResponse
-     */
     public CarritoGraphQLResponse toGraphQLResponse(CarritoResponseDto responseDto) {
         if (responseDto == null) {
             return null;
@@ -51,9 +44,6 @@ public class CarritoGraphQLMapper {
                 .build();
     }
 
-    /**
-     * Convierte lista de CarritoResponseDto a lista de CarritoGraphQLResponse
-     */
     public List<CarritoGraphQLResponse> toGraphQLResponseList(List<CarritoResponseDto> responseDtos) {
         if (responseDtos == null) {
             return null;

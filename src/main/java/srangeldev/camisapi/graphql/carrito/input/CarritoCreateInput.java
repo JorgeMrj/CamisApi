@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Input GraphQL simple para crear carrito (DAW)
- */
+
 @Data
 @Builder
 @NoArgsConstructor
