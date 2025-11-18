@@ -15,20 +15,17 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Value("${api.version:v1}")
     private String apiVersion;
 
-    private final WebSocketHandler webSocketHandler;
+    private final srangeldev.camisapi.websocket.config.WebSocketHandler webSocketHandler;
 
-    public WebSocketConfig(WebSocketHandler webSocketHandler) {
+    public WebSocketConfig(srangeldev.camisapi.websocket.config.WebSocketHandler webSocketHandler) {
         this.webSocketHandler = webSocketHandler;
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(webSocketHandler, "/ws/" + apiVersion + "/productos")
+        registry.addHandler(webSocketHandler, "/ws/" + apiVersion)
                 .setAllowedOriginPatterns("*");
     }
-
-    @Bean
-    public WebSocketHandler productosWebSocketHandler() {
-        return new srangeldev.camisapi.websocket.config.WebSocketHandler();
-    }
 }
+
+
