@@ -79,7 +79,7 @@ import static org.mockito.Mockito.*;
         pedidoResponseDto = PedidoResponseDto.builder()
                 .id(1L)
                 .userId("2")
-                .estado(EstadoPedido.PAGADO)
+                .estado(EstadoPedido.PENDIENTE_PAGO)
                 .createdAt(LocalDateTime.now())
                 .total(100.0)
                 .fechaPago((LocalDateTime.now()))
@@ -129,7 +129,7 @@ import static org.mockito.Mockito.*;
 
             assertAll(
                     () -> assertEquals(1, resultados.size()),
-                    () -> assertEquals(EstadoPedido.PAGADO, resultados.get(0).getEstado())
+                    () -> assertEquals(EstadoPedido.PENDIENTE_PAGO, resultados.get(0).getEstado())
             );
         }
 
@@ -155,7 +155,7 @@ import static org.mockito.Mockito.*;
     class ObtenerPorId{
 
         @Test
-        @DisplayName("Deveria devolver pedido si existe")
+        @DisplayName("Deberia devolver pedido si existe")
         void obtenerPorId_ok() {
             when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
             when(pedidoMappers.toResponseDto(pedido)).thenReturn(pedidoResponseDto);
@@ -183,9 +183,21 @@ import static org.mockito.Mockito.*;
         @Test
         @DisplayName("Deveria actualizar el estado de los pedidos")
         void actualizarEstado_ok(){
+            // Crear un DTO con el estado actualizado a PAGADO
+            PedidoResponseDto pedidoActualizadoDto = PedidoResponseDto.builder()
+                    .id(1L)
+                    .userId("2")
+                    .estado(EstadoPedido.PAGADO)
+                    .createdAt(pedidoResponseDto.getCreatedAt())
+                    .total(100.0)
+                    .fechaPago(pedidoResponseDto.getFechaPago())
+                    .fechaEnvio(pedidoResponseDto.getFechaEnvio())
+                    .detalles(pedidoResponseDto.getDetalles())
+                    .build();
+            
             when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedido));
             when(pedidoRepository.save(pedido)).thenReturn(pedido);
-            when(pedidoMappers.toResponseDto(pedido)).thenReturn(pedidoResponseDto);
+            when(pedidoMappers.toResponseDto(pedido)).thenReturn(pedidoActualizadoDto);
 
             PedidoResponseDto resultado = pedidoService.actualizarEstado(1L, EstadoPedido.PAGADO);
 

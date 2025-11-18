@@ -1,7 +1,6 @@
 package srangeldev.camisapi.rest.users.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -48,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(key = "#id")
-    public UserResponseDto findById(ObjectId id) {
+    public UserResponseDto findById(Long id) {
         log.info("Buscando usuario por id: {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado"));
@@ -68,6 +67,11 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto save(UserCreateRequestDto userCreateRequestDto) {
         log.info("Guardando usuario: {}", userCreateRequestDto);
         
+        // Verificar que no exista un usuario con el mismo idUsuario
+        userRepository.findById(userCreateRequestDto.getIdUsuario()).ifPresent(u -> {
+            throw new UserBadRequest("Ya existe un usuario con el id " + userCreateRequestDto.getIdUsuario());
+        });
+        
         // Verificar que no exista un usuario con el mismo username
         userRepository.findByUsername(userCreateRequestDto.getUsername()).ifPresent(u -> {
             throw new UserBadRequest("Ya existe un usuario con el username " + userCreateRequestDto.getUsername());
@@ -75,7 +79,6 @@ public class UserServiceImpl implements UserService {
 
         // Crear nuevo usuario
         User user = userMapper.toUsuario(userCreateRequestDto);
-        user.setId(new ObjectId()); // Asignar nuevo ObjectId
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         
@@ -86,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CachePut(key = "#id")
-    public UserResponseDto update(ObjectId id, UserUpdateRequestDto userUpdateRequestDto) {
+    public UserResponseDto update(Long id, UserUpdateRequestDto userUpdateRequestDto) {
         log.info("Actualizando usuario con id {}: {}", id, userUpdateRequestDto);
         
         // Buscar usuario existente
@@ -122,7 +125,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CacheEvict(key = "#id")
-    public void deleteById(ObjectId id) {
+    public void deleteById(Long id) {
         log.info("Borrando usuario por id: {}", id);
         
         // Verificar que existe

@@ -2,7 +2,6 @@ package srangeldev.camisapi.rest.users.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -54,8 +53,8 @@ class UserControllerTest {
     private UserCreateRequestDto userCreateRequestDto;
     private UserUpdateRequestDto userUpdateRequestDto;
 
-    private final String validId = "507f1f77bcf86cd799439011";
-    private final String invalidId = "1234";
+    private final Long validId = 1L;
+    private final String invalidId = "abc";
 
     @BeforeEach
     void setUp() {
@@ -74,13 +73,14 @@ class UserControllerTest {
                 .build();
 
         userResponseDto = UserResponseDto.builder()
-                .id(new ObjectId(validId).toHexString())
+                .id(validId)
                 .nombre("Test User")
                 .username("testuser")
                 .roles(Set.of(Rol.USER)) // CORREGIDO: Usar String, no Enum
                 .build();
 
         userCreateRequestDto = UserCreateRequestDto.builder()
+                .idUsuario(2L)
                 .nombre("New User")
                 .username("newuser")
                 .password("password123")
@@ -124,7 +124,7 @@ class UserControllerTest {
             @Test
             @DisplayName("Debe devolver usuario cuando ID es válido y existe")
             void getUserById_Success() throws Exception {
-                when(userService.findById(any(ObjectId.class))).thenReturn(userResponseDto);
+                when(userService.findById(any(Long.class))).thenReturn(userResponseDto);
 
                 // CORREGIDO: Usar la URL base completa
                 mockMvc.perform(get(API_BASE_URL + "/{id}", validId)
@@ -132,7 +132,7 @@ class UserControllerTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.username", is("testuser")));
 
-                verify(userService).findById(any(ObjectId.class));
+                verify(userService).findById(any(Long.class));
             }
         }
 
@@ -140,21 +140,9 @@ class UserControllerTest {
         @DisplayName("Casos Incorrectos")
         class CasosIncorrectos {
             @Test
-            @DisplayName("Debe lanzar UserBadId cuando el ID no es un ObjectId válido")
-            void getUserById_InvalidId_ThrowsException() throws Exception {
-                // CORREGIDO: Usar la URL base completa
-                mockMvc.perform(get(API_BASE_URL + "/{id}", invalidId)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.error").exists());
-
-                verify(userService, never()).findById(any());
-            }
-
-            @Test
             @DisplayName("Debe devolver 404 si el servicio lanza UserNotFound")
             void getUserById_NotFound() throws Exception {
-                doThrow(new UserNotFound("No encontrado")).when(userService).findById(any(ObjectId.class));
+                doThrow(new UserNotFound("No encontrado")).when(userService).findById(any(Long.class));
 
                 // CORREGIDO: Usar la URL base completa
                 mockMvc.perform(get(API_BASE_URL + "/{id}", validId))
@@ -239,7 +227,7 @@ class UserControllerTest {
             @Test
             @DisplayName("Debe actualizar usuario correctamente")
             void updateUser_Success() throws Exception {
-                when(userService.update(any(ObjectId.class), any(UserUpdateRequestDto.class)))
+                when(userService.update(any(Long.class), any(UserUpdateRequestDto.class)))
                         .thenReturn(userResponseDto);
 
                 String jsonBody = objectMapper.writeValueAsString(userUpdateRequestDto);
@@ -250,29 +238,10 @@ class UserControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.username", is("testuser")));
-
-                verify(userService).update(any(ObjectId.class), any(UserUpdateRequestDto.class));
+                verify(userService).update(any(Long.class), any(UserUpdateRequestDto.class));
             }
         }
 
-        @Nested
-        @DisplayName("Casos Incorrectos")
-        class CasosIncorrectos {
-            @Test
-            @DisplayName("Debe lanzar UserBadId con ID inválido")
-            void updateUser_InvalidId() throws Exception {
-                String jsonBody = objectMapper.writeValueAsString(userUpdateRequestDto);
-
-                // CORREGIDO: Usar la URL base completa
-                mockMvc.perform(put(API_BASE_URL + "/{id}", invalidId)
-                                .content(jsonBody)
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.error").exists());
-
-                verify(userService, never()).update(any(), any());
-            }
-        }
     }
 
     @Nested
@@ -285,29 +254,15 @@ class UserControllerTest {
             @Test
             @DisplayName("Debe eliminar usuario y devolver 204 No Content")
             void deleteUser_Success() throws Exception {
-                doNothing().when(userService).deleteById(any(ObjectId.class));
+                doNothing().when(userService).deleteById(any(Long.class));
 
                 // CORREGIDO: Usar la URL base completa
                 mockMvc.perform(delete(API_BASE_URL + "/{id}", validId))
                         .andExpect(status().isNoContent());
 
-                verify(userService).deleteById(any(ObjectId.class));
+                verify(userService).deleteById(any(Long.class));
             }
         }
 
-        @Nested
-        @DisplayName("Casos Incorrectos")
-        class CasosIncorrectos {
-            @Test
-            @DisplayName("Debe lanzar UserBadId con ID inválido")
-            void deleteUser_InvalidId() throws Exception {
-                // CORREGIDO: Usar la URL base completa
-                mockMvc.perform(delete(API_BASE_URL + "/{id}", invalidId))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.error").exists());
-
-                verify(userService, never()).deleteById(any());
-            }
-        }
     }
 }

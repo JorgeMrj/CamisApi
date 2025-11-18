@@ -17,6 +17,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserCreateRequestDto {
 
+    @NotNull(message = "El id del usuario no puede ser nulo")
+    private Long idUsuario;
+
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 50, message = "El nombre no puede tener más de 50 caracteres")
     private String nombre;
