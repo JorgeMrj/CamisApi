@@ -38,11 +38,15 @@ import java.util.stream.Collectors;
 @TypeAlias("User")
 public class User implements UserDetails {
     /**
-     * Identificador único del usuario en MongoDB usando ObjectId
+     * Identificador interno de MongoDB (ObjectId)
+     * Se mantiene para compatibilidad con MongoDB
+     */
+    private ObjectId _id;
+
+    /**
+     * Identificador único del usuario (clave primaria de negocio)
      */
     @Id
-    private ObjectId id;
-
     @NotNull(message = "El id del usuario no puede ser nulo")
     private Long idUsuario;
 

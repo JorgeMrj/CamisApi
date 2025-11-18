@@ -1,6 +1,5 @@
 package srangeldev.camisapi.rest.users.mappers;
 
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,16 +23,17 @@ class UserMapperTest {
     private UserCreateRequestDto createDto;
     private UserUpdateRequestDto updateDto;
     private User user;
-    private ObjectId userId;
+    private Long userId;
 
     @BeforeEach
     void setUp() {
         userMapper = new UserMapper(); // Instanciamos el mapper
-        userId = new ObjectId();
+        userId = 1L;
         LocalDateTime now = LocalDateTime.now();
 
         // DTO para crear
         createDto = UserCreateRequestDto.builder()
+                .idUsuario(userId)
                 .nombre("Test User")
                 .username("testuser")
                 .password("password123")
@@ -42,7 +42,7 @@ class UserMapperTest {
 
         // Entidad completa
         user = User.builder()
-                .id(userId)
+                .idUsuario(userId)
                 .nombre("Original Name")
                 .username("originaluser")
                 .password("hashedPassword")
@@ -64,12 +64,11 @@ class UserMapperTest {
 
             // Assert
             assertAll(
+                    () -> assertEquals(createDto.getIdUsuario(), result.getIdUsuario()),
                     () -> assertEquals(createDto.getNombre(), result.getNombre()),
                     () -> assertEquals(createDto.getUsername(), result.getUsername()),
                     () -> assertEquals(createDto.getPassword(), result.getPassword()),
-                    () -> assertEquals(createDto.getRoles(), result.getRoles()),
-                    // Campos no asignados por este mapper deben ser nulos
-                    () -> assertNull(result.getId())
+                    () -> assertEquals(createDto.getRoles(), result.getRoles())
             );
         }
     }
@@ -86,8 +85,7 @@ class UserMapperTest {
 
             // Assert
             assertAll(
-                    // Convierte ObjectId a String
-                    () -> assertEquals(user.getId().toHexString(), result.getId()),
+                    () -> assertEquals(user.getIdUsuario(), result.getId()),
                     () -> assertEquals(user.getNombre(), result.getNombre()),
                     () -> assertEquals(user.getUsername(), result.getUsername()),
                     () -> assertEquals(user.getRoles(), result.getRoles()),
@@ -100,7 +98,7 @@ class UserMapperTest {
         @DisplayName("Debe manejar ID nulo (para usuarios aún no guardados)")
         void toUsuarioResponseDto_ShouldHandleNullId() {
             // Arrange
-            user.setId(null);
+            user.setIdUsuario(null);
 
             // Act
             UserResponseDto result = userMapper.toUsuarioResponseDto(user);

@@ -2,7 +2,6 @@ package srangeldev.camisapi.rest.users.controllers;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,21 +42,12 @@ public class UserController {
     }
 
     /**
-     * Obtiene un usuario por su ID (ObjectId)
+     * Obtiene un usuario por su ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable String id) {
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         log.info("Buscando usuario por id: {}", id);
-        
-        // Validar que el ID es un ObjectId válido
-        ObjectId objectId;
-        try {
-            objectId = new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            throw new UserBadId("El ID proporcionado no es válido: " + id);
-        }
-        
-        return ResponseEntity.ok(userService.findById(objectId));
+        return ResponseEntity.ok(userService.findById(id));
     }
 
     /**
@@ -83,19 +73,10 @@ public class UserController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> updateUser(
-            @PathVariable String id, 
+            @PathVariable Long id, 
             @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
         log.info("Actualizando usuario con id: {} y datos: {}", id, userUpdateRequestDto);
-        
-        // Validar que el ID es un ObjectId válido
-        ObjectId objectId;
-        try {
-            objectId = new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            throw new UserBadId("El ID proporcionado no es válido: " + id);
-        }
-        
-        return ResponseEntity.ok(userService.update(objectId, userUpdateRequestDto));
+        return ResponseEntity.ok(userService.update(id, userUpdateRequestDto));
     }
 
     /**
@@ -103,17 +84,8 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable String id) {
+    public void deleteUser(@PathVariable Long id) {
         log.info("Eliminando usuario con id: {}", id);
-        
-        // Validar que el ID es un ObjectId válido
-        ObjectId objectId;
-        try {
-            objectId = new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            throw new UserBadId("El ID proporcionado no es válido: " + id);
-        }
-        
-        userService.deleteById(objectId);
+        userService.deleteById(id);
     }
 }
