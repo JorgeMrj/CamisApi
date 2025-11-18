@@ -15,6 +15,7 @@ import srangeldev.camisapi.rest.users.mappers.UserMapper;
 import srangeldev.camisapi.rest.users.models.User;
 import srangeldev.camisapi.rest.users.repositories.UserRepository;
 import srangeldev.camisapi.rest.users.exceptions.UserBadRequest;
+import srangeldev.camisapi.websocket.config.WebSocketHandler;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,19 +31,26 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final WebSocketHandler webSocketHandler;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, WebSocketHandler webSocketHandler) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.webSocketHandler = webSocketHandler;
     }
 
     @Override
     public List<UserResponseDto> findAll() {
         log.info("Buscando todos los usuarios");
-        return userRepository.findAll().stream()
+
+        List<UserResponseDto> usuarios = userRepository.findAll().stream()
                 .map(userMapper::toUsuarioResponseDto)
                 .toList();
+
+        webSocketHandler.enviarMensajeATodos("Usuarios listados correctamente");
+
+        return usuarios;
     }
 
     @Override
@@ -51,6 +59,8 @@ public class UserServiceImpl implements UserService {
         log.info("Buscando usuario por id: {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFound("Usuario con id " + id + " no encontrado"));
+
+        webSocketHandler.enviarMensajeATodos("Usuario encontrado con id:" +id);
         return userMapper.toUsuarioResponseDto(user);
     }
 
