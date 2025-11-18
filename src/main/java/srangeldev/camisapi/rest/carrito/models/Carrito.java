@@ -45,7 +45,7 @@ public class Carrito {
      */
     @NotNull(message = "El usuario no puede ser nulo")
     @Column(name = "user_id", nullable = false, length = 24)
-    private String userId;
+    private Long userId;
     
     /**
      * Lista de productos en el carrito (relación @OneToMany)

@@ -28,12 +28,12 @@ import lombok.NoArgsConstructor;
 public class DetallePedido {
     
     /**
-     * Referencia al ID del producto en PostgreSQL
+     * Referencia al ID del producto en MongoDB
      * Se mantiene para trazabilidad, aunque el producto puede ya no existir
      */
     @NotNull(message = "El ID del producto no puede ser nulo")
     @Column(name = "producto_id", nullable = false)
-    private Long productoId;
+    private String productoId;
     
     /**
      * Nombre del producto en el momento de la venta
